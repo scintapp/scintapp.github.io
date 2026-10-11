@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Scint Landing Page</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
+<style>
+/* Layout: one reading column for the argument; figures break out to the full wrap. Dark-first, after the app's own canvas. */
+:root {
+  color-scheme: dark;
+  --ground: #131314;
+  --canvas: #1a1a1b;
+  --surface: #222225;
+  --ink: #f0edef;
+  --ink-2: #cfccce;
+  --muted: #98969a;
+  --faint: #6a686d;
+  --line: rgba(240, 237, 239, 0.1);
+  --line-strong: rgba(240, 237, 239, 0.24);
+  --compose: #c7a3e7;
+  --dispatch: #f9b588;
+  --evaluate: #f1a3ab;
+  --observe: #abe3f3;
+  --search: #b7ecbc;
+  --shadow: rgba(0, 0, 0, 0.5);
+  --display: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --body: "Hanken Grotesk", -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --data: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --ground: #f5f3f4;
+    --canvas: #fbfafb;
+    --surface: #ffffff;
+    --ink: #1b1a1c;
+    --ink-2: #3a383c;
+    --muted: #6b686e;
+    --faint: #98959b;
+    --line: rgba(27, 26, 28, 0.11);
+    --line-strong: rgba(27, 26, 28, 0.3);
+    --compose: #7b52b3;
+    --dispatch: #b4601f;
+    --evaluate: #b24553;
+    --observe: #1c7c96;
+    --search: #2c7f45;
+    --shadow: rgba(40, 30, 40, 0.18);
+  }
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --ground: #f5f3f4;
+  --canvas: #fbfafb;
+  --surface: #ffffff;
+  --ink: #1b1a1c;
+  --ink-2: #3a383c;
+  --muted: #6b686e;
+  --faint: #98959b;
+  --line: rgba(27, 26, 28, 0.11);
+  --line-strong: rgba(27, 26, 28, 0.3);
+  --compose: #7b52b3;
+  --dispatch: #b4601f;
+  --evaluate: #b24553;
+  --observe: #1c7c96;
+  --search: #2c7f45;
+  --shadow: rgba(40, 30, 40, 0.18);
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap {
+  max-width: 1060px;
+  margin-inline: auto;
+  padding-inline: clamp(16px, 4vw, 40px);
+}
+main { display: flex; flex-direction: column; gap: clamp(72px, 11vw, 136px); padding-block: 0 96px; }
+section { display: flex; flex-direction: column; gap: 28px; }
+.prose { max-width: 62ch; display: flex; flex-direction: column; gap: 16px; }
+.prose p { margin: 0; color: var(--ink-2); }
+h1, h2 { font-family: var(--display); font-weight: 400; margin: 0; text-wrap: balance; letter-spacing: -0.018em; }
+h1 { font-size: clamp(2.6rem, 7vw, 4.6rem); line-height: 1.0; max-width: 13ch; }
+h2 { font-size: clamp(1.8rem, 3.8vw, 2.7rem); line-height: 1.08; max-width: 20ch; }
+h1 em, h2 em { font-style: italic; }
+.label {
+  display: flex; align-items: center; gap: 9px;
+  font-family: var(--data); font-size: 12px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted);
+}
+.glyph { width: 11px; height: 11px; border: 1.5px solid currentColor; border-radius: 3.5px; flex: none; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 6px; }
+
+/* header */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 22px; }
+.mark { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 17px; letter-spacing: -0.01em; }
+.mark .glyph { width: 16px; height: 16px; border-width: 2px; border-radius: 5px; }
+.top nav { display: flex; gap: 22px; }
+.top a { font-size: 15px; color: var(--muted); text-decoration: none; }
+.top a:hover { color: var(--ink); }
+
+/* hero */
+.hero { gap: 30px; padding-top: clamp(28px, 6vw, 72px); }
+.lede { font-size: clamp(1.1rem, 1.9vw, 1.3rem); line-height: 1.5; color: var(--ink-2); max-width: 54ch; margin: 0; }
+.signup { display: flex; flex-wrap: wrap; gap: 10px; max-width: 480px; }
+.signup input {
+  flex: 1 1 220px; min-width: 0; height: 46px; padding: 0 16px;
+  background: var(--canvas); color: var(--ink); border: 1px solid var(--line-strong); border-radius: 12px;
+  font: inherit; font-size: 16px;
+}
+.signup input::placeholder { color: var(--faint); }
+.btn {
+  height: 46px; padding: 0 20px; border: 0; border-radius: 12px; cursor: pointer;
+  background: var(--ink); color: var(--ground); font: inherit; font-size: 16px; font-weight: 600;
+}
+.btn:hover { opacity: 0.88; }
+.fine { font-size: 14px; color: var(--muted); margin: 0; min-height: 1.5em; }
+
+/* figures */
+figure { margin: 0; display: flex; flex-direction: column; gap: 14px; }
+figcaption { font-size: 14.5px; line-height: 1.5; color: var(--muted); max-width: 70ch; }
+.shot img {
+  display: block; width: 100%; height: auto; max-width: 100%;
+  border-radius: clamp(8px, 1.6vw, 18px);
+  border: 1px solid var(--line);
+  box-shadow: 0 24px 60px -24px var(--shadow);
+}
+.panel {
+  background: var(--canvas); border: 1px solid var(--line); border-radius: 20px;
+  padding: clamp(16px, 3vw, 28px);
+  display: flex; flex-direction: column; gap: 22px;
+}
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg button {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 36px; padding: 0 14px; border-radius: 10px; cursor: pointer;
+  background: transparent; color: var(--muted); border: 1px solid var(--line);
+  font: inherit; font-size: 15px; font-weight: 500;
+}
+.seg button:hover { color: var(--ink); }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); border-color: var(--line-strong); }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hue, var(--muted)); flex: none; }
+.h-compose { --hue: var(--compose); }
+.h-dispatch { --hue: var(--dispatch); }
+.h-evaluate { --hue: var(--evaluate); }
+.h-observe { --hue: var(--observe); }
+.h-search { --hue: var(--search); }
+.h-root { --hue: var(--ink); }
+
+/* transcript tree */
+.ctx { display: flex; flex-direction: column; gap: 12px; }
+.ctx-bar { display: flex; gap: 3px; height: 14px; }
+.ctx-bar span { background: var(--hue); border: 1.5px solid var(--hue); border-radius: 4px; min-width: 7px; transition: opacity 0.2s; }
+.ctx-key { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 20px; }
+.ctx-key div { display: flex; flex-direction: column; gap: 2px; min-width: 0; transition: opacity 0.2s; }
+.ctx-key b { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; }
+.ctx-key .num { font-family: var(--data); font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.ctx-key .sub { font-size: 13px; color: var(--muted); }
+.off { opacity: 0.28; }
+.ctx-bar span.hollow { background: transparent; opacity: 0.7; }
+.lens-note { margin: 0; font-size: 15.5px; color: var(--ink-2); max-width: 68ch; min-height: 3.1em; }
+
+.ledger { display: flex; flex-direction: column; gap: 14px; max-width: 720px; width: 100%; margin-inline: auto; padding-top: 6px; }
+.ledger > * { transition: opacity 0.2s; }
+.req {
+  align-self: flex-end; max-width: 78%;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+  padding: 10px 14px; font-size: 15.5px; line-height: 1.5;
+}
+.rep { font-size: 15.5px; line-height: 1.55; color: var(--ink-2); max-width: 92%; }
+.run {
+  display: flex; align-items: center; gap: 9px; flex-wrap: wrap;
+  width: 100%; padding: 8px 10px; margin: 0;
+  background: transparent; border: 1px dashed var(--line-strong); border-radius: 10px;
+  color: var(--ink); font: inherit; font-size: 14.5px; text-align: left;
+}
+button.run { cursor: pointer; }
+button.run:hover { background: var(--surface); }
+.run .meta { font-family: var(--data); font-size: 12.5px; color: var(--muted); }
+.run .carry { margin-left: auto; font-family: var(--data); font-size: 12px; color: var(--muted); }
+.run .chev { width: 10px; height: 10px; flex: none; transition: transform 0.15s; color: var(--muted); }
+.run .carry + .chev { margin-left: 0; }
+.run .chev:only-of-type { margin-left: auto; }
+.run[aria-expanded="true"] .chev { transform: rotate(90deg); }
+.branch {
+  margin: -6px 0 0 14px; padding: 4px 0 4px 16px;
+  border-left: 2px solid var(--hue);
+  display: flex; flex-direction: column; gap: 7px;
+}
+.branch p { margin: 0; font-size: 14px; line-height: 1.45; color: var(--ink-2); display: flex; gap: 10px; align-items: baseline; }
+.branch code { font-family: var(--data); font-size: 11.5px; color: var(--muted); flex: 0 0 68px; }
+.branch .aside { color: var(--muted); font-size: 13.5px; }
+[data-lens="carried"] .ledger .not-carried { opacity: 0.3; }
+[data-lens="carried"] .ledger .carried { box-shadow: -3px 0 0 var(--ink); padding-left: 12px; }
+[data-lens="carried"] .ledger .req.carried { box-shadow: 3px 0 0 var(--ink); padding-left: 14px; }
+.carry { display: none; }
+[data-lens="carried"] .carry { display: inline; }
+[data-lens="carried"] .run .chev { display: none; }
+[data-lens="kept"] .ledger .req, [data-lens="kept"] .ledger .rep { opacity: 0.45; }
+
+/* task illustration */
+.task { max-width: 620px; background: var(--canvas); border: 1px solid var(--line); border-radius: 18px; padding: clamp(18px, 3vw, 28px); display: flex; flex-direction: column; gap: 16px; }
+.task-title { display: flex; align-items: center; gap: 12px; font-size: 21px; font-weight: 600; letter-spacing: -0.01em; }
+.task-title .glyph { width: 18px; height: 18px; border-radius: 6px; color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; padding-block: 14px; border-block: 1px solid var(--line); }
+.chip { display: inline-flex; align-items: center; gap: 7px; height: 30px; padding: 0 11px; border-radius: 9px; background: var(--surface); border: 1px solid var(--line); font-size: 14px; color: var(--ink-2); }
+.chip small { font-family: var(--data); font-size: 11px; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; }
+.task-body { display: flex; flex-direction: column; gap: 12px; font-size: 15.5px; color: var(--ink-2); }
+.task-body p { margin: 0; }
+.embed { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 11px; border: 1px solid var(--line-strong); background: var(--surface); font-size: 15px; color: var(--ink); }
+.embed span { margin-left: auto; font-family: var(--data); font-size: 12px; color: var(--muted); }
+
+/* intent figure */
+.aperture { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 28px 40px; align-items: start; }
+.aperture svg { width: 100%; height: auto; max-width: 100%; display: block; color: var(--ink); }
+.n rect { fill: var(--surface); stroke: var(--line-strong); stroke-width: 1.2; }
+.n text { fill: currentColor; font-family: var(--body); font-size: 13px; }
+.e { stroke: currentColor; fill: none; stroke-width: 1.2; }
+.elabel { fill: currentColor; font-family: var(--data); font-size: 10.5px; }
+.n, .e, .elabel { opacity: 0.26; transition: opacity 0.2s; }
+.n.lit, .e.lit, .elabel.lit { opacity: 1; }
+.n.lit rect { stroke: var(--hue); stroke-width: 1.6; }
+.ap-side { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.ap-work { margin: 0; font-size: 16px; color: var(--ink-2); min-height: 4.8em; }
+.ap-side h3 { margin: 0 0 8px; font-family: var(--data); font-weight: 400; font-size: 11.5px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+.listed { display: flex; flex-wrap: wrap; gap: 8px; }
+.listed .chip.on { border-color: var(--hue); color: var(--ink); }
+.bars { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 9px 12px; align-items: center; font-size: 14px; }
+.bars .name { color: var(--ink-2); }
+.bars .track { height: 10px; border-radius: 5px; background: var(--surface); border: 1px solid var(--line); overflow: hidden; }
+.bars .fill { display: block; height: 100%; background: var(--hue); border-radius: 4px; transition: width 0.25s; }
+.bars .val { font-family: var(--data); font-size: 12.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; text-align: right; min-width: 9ch; }
+.ap-struct { margin: 10px 0 0; font-size: 14px; color: var(--muted); }
+
+/* day chart */
+.day svg { width: 100%; height: auto; max-width: 100%; display: block; color: var(--ink); }
+.day .axis { stroke: currentColor; stroke-width: 1; opacity: 0.3; fill: none; }
+.day .ceil { stroke: currentColor; stroke-width: 1; stroke-dasharray: 3 5; opacity: 0.4; fill: none; }
+.day .session { stroke: currentColor; stroke-width: 1.8; fill: none; opacity: 0.6; stroke-linejoin: round; }
+.day .space { stroke: var(--evaluate); stroke-width: 2.2; fill: none; stroke-linejoin: round; }
+.day .band { fill: var(--evaluate); opacity: 0.13; }
+.day text { font-family: var(--body); font-size: 13px; fill: currentColor; }
+.day .t-muted { opacity: 0.6; }
+.day .t-space { fill: var(--evaluate); font-weight: 600; }
+.day .t-data { font-family: var(--data); font-size: 11px; opacity: 0.6; }
+.scroll { overflow-x: auto; }
+.scroll svg { min-width: 560px; }
+
+/* yours */
+.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 48px; }
+.facts div { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--line-strong); padding-top: 16px; min-width: 0; }
+.facts h3 { margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -0.005em; }
+.facts p { margin: 0; font-size: 16px; color: var(--ink-2); }
+.facts code { font-family: var(--data); font-size: 0.86em; color: var(--ink); overflow-wrap: anywhere; }
+
+/* status */
+.close { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 48px; align-items: start; }
+.close > div { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.close h3 { margin: 0; font-size: 19px; font-weight: 600; }
+.close p { margin: 0; font-size: 16px; color: var(--ink-2); }
+.terms { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 9px; font-size: 16px; color: var(--ink-2); }
+.terms li { display: flex; gap: 12px; align-items: baseline; }
+.terms li::before { content: ""; width: 7px; height: 7px; border: 1.5px solid var(--muted); border-radius: 2.5px; flex: none; transform: translateY(-1px); }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line-strong); align-self: flex-start; }
+footer { border-top: 1px solid var(--line); padding-block: 28px 8px; font-size: 14px; color: var(--muted); display: flex; flex-direction: column; gap: 6px; }
+footer p { margin: 0; max-width: 72ch; }
+
+@media (max-width: 760px) {
+  body { font-size: 16px; }
+  .aperture, .facts, .close { grid-template-columns: minmax(0, 1fr); }
+  .ctx-key { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .req { max-width: 92%; }
+  .rep { max-width: 100%; }
+  .ap-work, .lens-note { min-height: 0; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="mark"><span class="glyph"></span>Scint</div>
+    <nav><a href="runtime.html">The runtime</a><a href="#follow">Get updates</a></nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="label"><span class="glyph"></span>For macOS · in development</div>
+      <h1>Work that stays where you <em>put</em> it.</h1>
+      <p class="lede">Scint is a workspace where agents run inside your projects. Every space keeps its own documents, commands and conversation, so the work is still there when the model's turn ends, and the next request starts from it.</p>
+      <form class="signup" id="signup-top" novalidate>
+        <input id="email-top" type="email" name="email" autocomplete="email" placeholder="you@example.com" aria-label="Email address">
+        <button class="btn" id="submit-top" type="submit">Get updates</button>
+      </form>
+      <p class="fine" id="note-top">Development notes and early builds. Nothing else.</p>
+      <figure class="shot">
+        <img src="shot3.jpg" width="1657" height="1202" alt="The Scint window. A request in the conversation asks for a structural model; the sidebar is filled with 28 new spaces and the agent's reply lists what it created.">
+        <figcaption>One request to an empty project. 1 minute 22 seconds later it holds 28 spaces, 5 documents and 8 bridges. Each space can hold work and run an agent of its own.</figcaption>
+      </figure>
+    </section>
+
+    <section>
+      <div class="label"><span class="glyph"></span>The session</div>
+      <h2>A session is the wrong place to keep work.</h2>
+      <div class="prose">
+        <p>Most agent software is built around a session. A loop hands the model its message history, the model calls tools, and the history grows. An hour in, the early context is crowding out the new. When the session closes, the work is whatever happened to reach the disk, and the reasoning behind it sits in a thread you will not find again.</p>
+        <p>Scint keeps the model loop and moves the work out of it. A project is made of spaces. Each space holds its materials, its commands and one conversation. Agents run inside spaces and change the same objects you are looking at.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="label"><span class="glyph"></span>Collaboration</div>
+      <h2>Delegation creates a place.</h2>
+      <div class="prose">
+        <p>Hand a job to a sub-agent in most tools and a summary comes back. The context it spent is gone. In Scint a coordinating space briefs a child space and starts it. The child keeps its own documents and its own history. You can open it, read what happened, and continue the conversation the coordinator began.</p>
+        <p>A request from a person, from another space and from a schedule all arrive the same way, as a document submitted to a space. Every run is queued, recorded and cancelled by the same rules, whoever asked.</p>
+      </div>
+      <figure class="shot">
+        <img src="shot4.jpg" width="1657" height="1202" alt="The same project drawn as a graph. Spaces are cards connected left to right by containment lines, with curved bridge lines crossing between branches. Each card shows the space's name, intent and description.">
+        <figcaption>The same project as a graph. Containment runs left to right, and the curved lines are bridges between spaces that work together. Each space carries its own intent and its own documents.</figcaption>
+      </figure>
+    </section>
+
+    <section>
+      <div class="label"><span class="glyph"></span>Tasks</div>
+      <h2>A task is a document that runs itself.</h2>
+      <div class="prose">
+        <p>Tasks are written in the same editor as everything else. A task holds its instructions, its schedule, the command that runs it and the space it runs in. Its instructions can embed other documents, and those are read fresh each time the task fires.</p>
+        <p>When a schedule comes due it wakes a task that already lives in a space, with that space's materials and run history around it. Recurring work keeps one editable definition and a complete record of every run.</p>
+      </div>
+      <figure>
+        <div class="task" aria-label="Illustration of a task document">
+          <div class="task-title"><span class="glyph"></span>Summarize last week's notes</div>
+          <div class="chips">
+            <span class="chip"><small>When</small>Mondays, 9:00</span>
+            <span class="chip"><small>Repeats</small>Weekly</span>
+            <span class="chip"><small>Space</small>Editorial</span>
+            <span class="chip"><small>Command</small>Claude Code</span>
+          </div>
+          <div class="task-body">
+            <p>Read everything added to this space since last Monday and write a one-page summary. Lead with decisions, then open questions.</p>
+            <div class="embed"><span class="glyph" style="margin:0;color:var(--dispatch)"></span>Research notes<span>document</span></div>
+            <p>Add the summary to Weekly digests and say which notes you left out.</p>
+          </div>
+        </div>
+        <figcaption>An illustration of a task as it is written: a schedule, a space, a command, and instructions that hold another document by reference.</figcaption>
+      </figure>
+    </section>
+
+    <section>
+      <div class="label"><span class="glyph"></span>Conversation</div>
+      <h2>One conversation per space.</h2>
+      <div class="prose">
+        <p>A space has one thread. Your requests and the agent's replies go in it. Everything the agent did to produce a reply, its reasoning, every tool call, every error, is kept in a branch of its own, attached to the thread at the point where the run happened.</p>
+        <p>You read a short conversation. The full record of the work is one step away when you want it.</p>
+      </div>
+      <figure>
+        <div class="panel" id="tree" data-lens="read">
+          <div class="seg" role="group" aria-label="Choose a view of the conversation">
+            <button type="button" id="lens-read" data-lens="read" aria-pressed="true">What you read</button>
+            <button type="button" id="lens-kept" data-lens="kept" aria-pressed="false">What the runs kept</button>
+            <button type="button" id="lens-carried" data-lens="carried" aria-pressed="false">What the next request carries</button>
+          </div>
+
+          <div class="ctx">
+            <div class="ctx-bar" aria-hidden="true">
+              <span class="h-root" data-t="root" style="flex: 420 1 0"></span>
+              <span class="h-compose" data-t="compose" style="flex: 18000 1 0"></span>
+              <span class="h-evaluate" data-t="evaluate" style="flex: 23 1 0"></span>
+            </div>
+            <div class="ctx-key">
+              <div data-t="root"><b><span class="dot h-root"></span>The thread</b><span class="num">≈ 420 tokens · 2%</span><span class="sub">6 entries, no tool calls</span></div>
+              <div data-t="compose"><b><span class="dot h-compose"></span>Compose runs</b><span class="num">≈ 18K tokens · 98%</span><span class="sub">76 entries, 61 tool calls, 2 runs</span></div>
+              <div data-t="evaluate"><b><span class="dot h-evaluate"></span>Evaluate run</b><span class="num">≈ 23 tokens · under 1%</span><span class="sub">1 entry, no tool calls</span></div>
+            </div>
+          </div>
+
+          <p class="lens-note" id="lens-note"></p>
+
+          <div class="ledger">
+            <div class="req carried">Make me a complex structural model using this space as a starting point. At least a dozen spaces, several levels of nesting, a few documents, and bridges where they make sense.</div>
+            <button type="button" class="run h-compose not-carried" id="run-1" aria-expanded="false" aria-controls="branch-1">
+              <span class="dot"></span>Compose <span class="meta">Codex · 1m 22s</span><span class="carry">stays in its branch</span>
+              <svg class="chev" viewBox="0 0 10 10" aria-hidden="true"><path d="M3 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="branch h-compose not-carried" id="branch-1" hidden>
+              <p><code>structure</code><span>View this space</span></p>
+              <p><code>structure</code><span>Create Atlas Program: 28 spaces in one call</span></p>
+              <p><code>structure</code><span>View Delivery, Discovery, Governance, Operations</span></p>
+              <p><code>content</code><span>Create 5 documents, among them Program Charter, Architecture Decision Template and Operational Readiness Checklist</span></p>
+              <p><code>structure</code><span>Bridge Evidence Library, Quality Lab, Release Train, Design System, Steering Council, Insights Loop, Incident Command, Risk Council</span></p>
+              <p><code>structure</code><span>View every space again to verify it</span></p>
+              <p class="aside">Plus the agent's reasoning between calls.</p>
+            </div>
+            <div class="rep carried">Created the Atlas Program structural model under Compose. It includes 28 nested spaces across Governance, Discovery, Delivery and Operations, three levels of branching, 5 documents and 8 cross-functional bridges. The structure and all relationships were verified.</div>
+
+            <div class="req carried">Thanks for verifying. This seems like a model of an organization.</div>
+            <div class="run h-compose not-carried" id="run-2"><span class="dot"></span>Compose <span class="meta">Codex · 10s</span><span class="carry">stays in its branch</span></div>
+            <div class="rep carried">Yes, it's an organizational operating model: governance, discovery, delivery and operations, with bridges representing decision and feedback flows.</div>
+
+            <div class="req carried">Not at all, this is good. What inspired the name?</div>
+            <button type="button" class="run h-evaluate carried" id="run-3" aria-expanded="false" aria-controls="branch-3">
+              <span class="dot"></span>Evaluate <span class="meta">Claude Code · 10s</span><span class="carry">carried</span>
+              <svg class="chev" viewBox="0 0 10 10" aria-hidden="true"><path d="M3 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="branch h-evaluate carried" id="branch-3" hidden>
+              <p class="aside">One entry: the reply. The request was routed to Evaluate and answered by a different provider than the one that built the project.</p>
+            </div>
+            <div class="rep carried">"Atlas" came from two associations: a map that organizes a complex landscape, and the mythic Atlas carrying a large interconnected system.</div>
+          </div>
+        </div>
+        <figcaption>A recorded conversation with one space, three requests long. The bar is everything the space has recorded, divided by transcript. Open a run to see what it did.</figcaption>
+      </figure>
+      <div class="prose">
+        <p>The runs that built this project spent about 18,000 tokens across 61 tool calls. The conversation they left behind is about 420. Nothing was summarized away: every call is still in its branch, kept whole and carried by no one.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="label"><span class="glyph"></span>Context</div>
+      <h2>Context is resolved, never accumulated.</h2>
+      <div class="prose">
+        <p>No request inherits a growing stack of messages. Each one is assembled from the space as it stands: the intent's instructions, the structure and commands in view, an index of the space's documents, a bounded excerpt of history, and the request. Revise a brief or change the model, and the next request sees the space as you left it.</p>
+        <p>Intent decides the view. Arranging work across spaces needs breadth. Finishing a piece of work needs depth. There is no mode to pick.</p>
+        <p>Each request is routed by Jev, TypeSafe's decision model. It reads the request and returns one choice with a confidence. Above one half, the space switches intent. Below it, the space stays as it is and the request runs anyway. Routing takes one call and no agent turn.</p>
+      </div>
+
+      <figure>
+        <div class="panel h-compose" id="aperture" data-intent="compose">
+          <div class="seg" role="group" aria-label="Choose an intent">
+            <button type="button" id="intent-compose" class="h-compose" data-intent="compose" aria-pressed="true"><span class="dot"></span>Compose</button>
+            <button type="button" id="intent-dispatch" class="h-dispatch" data-intent="dispatch" aria-pressed="false"><span class="dot"></span>Dispatch</button>
+            <button type="button" id="intent-evaluate" class="h-evaluate" data-intent="evaluate" aria-pressed="false"><span class="dot"></span>Evaluate</button>
+            <button type="button" id="intent-observe" class="h-observe" data-intent="observe" aria-pressed="false"><span class="dot"></span>Observe</button>
+            <button type="button" id="intent-search" class="h-search" data-intent="search" aria-pressed="false"><span class="dot"></span>Search</button>
+          </div>
+          <div class="aperture">
+            <div>
+              <svg viewBox="0 0 430 280" role="img" aria-label="A space, its three child spaces and one bridged space. The selected intent decides which of them the agent is shown.">
+                <path class="e e-child" d="M160 140H206M206 52V228M206 52H250M206 140H250M206 228H250"/>
+                <text class="elabel e-child" x="166" y="132">contains</text>
+                <path class="e e-bridge" d="M90 162V216" stroke-dasharray="4 4"/>
+                <text class="elabel e-bridge" x="100" y="193">bridge</text>
+                <g class="n n-own"><rect x="20" y="118" width="140" height="44" rx="11"/><text x="90" y="145" text-anchor="middle">This space</text></g>
+                <g class="n n-child"><rect x="250" y="30" width="150" height="44" rx="11"/><text x="325" y="57" text-anchor="middle">Child space</text></g>
+                <g class="n n-child"><rect x="250" y="118" width="150" height="44" rx="11"/><text x="325" y="145" text-anchor="middle">Child space</text></g>
+                <g class="n n-child"><rect x="250" y="206" width="150" height="44" rx="11"/><text x="325" y="233" text-anchor="middle">Child space</text></g>
+                <g class="n n-bridge"><rect x="20" y="216" width="140" height="44" rx="11"/><text x="90" y="243" text-anchor="middle">Bridged space</text></g>
+              </svg>
+              <p class="ap-struct" id="ap-struct"></p>
+            </div>
+            <div class="ap-side">
+              <p class="ap-work" id="ap-work"></p>
+              <div>
+                <h3>Listed in the request</h3>
+                <div class="listed">
+                  <span class="chip" data-k="documents">Documents</span>
+                  <span class="chip" data-k="commands">Commands</span>
+                  <span class="chip" data-k="harnesses">Harnesses</span>
+                  <span class="chip" data-k="artifacts">Files and folders</span>
+                </div>
+              </div>
+              <div>
+                <h3>History, in characters</h3>
+                <div class="bars">
+                  <span class="name">The thread</span><span class="track"><span class="fill" id="bar-root"></span></span><span class="val" id="val-root"></span>
+                  <span class="name" id="name-branch">Run detail</span><span class="track"><span class="fill" id="bar-branch"></span></span><span class="val" id="val-branch"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <figcaption>What an agent is shown at the start of a request, by intent. Compose sees the organization and a short excerpt of every kind of run. Evaluate sees only its own space and far more of its own working history.</figcaption>
+      </figure>
+
+      <figure class="day">
+        <div class="scroll">
+          <svg viewBox="0 0 720 300" role="img" aria-label="Schematic chart. A session's carried history climbs to the context window and drops at each compaction, three times across a day. A space's carried history stays flat inside a narrow band.">
+            <path class="ceil" d="M60 50H690"/>
+            <text class="t-data" x="60" y="42">context window</text>
+            <rect class="band" x="60" y="222" width="630" height="26"/>
+            <path class="session" d="M60 228L130 180L200 125L262 60L266 172L330 128L396 82L430 60L434 172L500 128L566 82L600 60L604 172L690 112"/>
+            <path class="space" d="M60 238L130 232L200 240L266 234L330 238L396 231L434 239L500 235L566 238L604 232L690 236"/>
+            <path class="axis" d="M60 262H690"/>
+            <text class="t-muted" x="684" y="98" text-anchor="end">A session</text>
+            <text class="t-space" x="684" y="214" text-anchor="end">A space in Scint</text>
+            <text class="t-data" x="272" y="190">compaction</text>
+            <text class="t-data" x="60" y="284">first request</text>
+            <text class="t-data" x="690" y="284" text-anchor="end">end of the day</text>
+            <text class="t-data" x="60" y="20">history carried into each request</text>
+          </svg>
+        </div>
+        <figcaption>A schematic, not a measurement. A session carries its whole history until it reaches the window and is compacted into a summary. A space assembles each request inside its intent's budget, so the last request of the day starts as light as the first.</figcaption>
+      </figure>
+    </section>
+
+    <section>
+      <div class="label"><span class="glyph"></span>Yours</div>
+      <h2>Your files, your terminal, your models.</h2>
+      <div class="facts">
+        <div>
+          <h3>Plain files</h3>
+          <p>Spaces, documents and history are JSON on your Mac, under <code>~/.local/share/scint</code>. Read them, diff them, back them up.</p>
+        </div>
+        <div>
+          <h3>Any provider, mid-conversation</h3>
+          <p>Codex and Claude Code are both built in. Each run is a single call that is asked to remember nothing. Continuity lives in the space, so you can change provider between two requests and the second picks up where the first stopped.</p>
+        </div>
+        <div>
+          <h3>Commands are tools</h3>
+          <p>A command is an executable with typed arguments. Add one to a space and that space's agent can call it. It runs with your shell's environment, the way it does in your terminal.</p>
+        </div>
+        <div>
+          <h3>Everything has an address</h3>
+          <p>Every space, document and command has a <code>scint://</code> link. Paste one into a document, hand one to an agent, or open one from Shortcuts.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="follow">
+      <div class="label"><span class="glyph"></span>Status</div>
+      <h2>In development, and far enough along to show.</h2>
+      <div class="prose">
+        <p>Scint is designed and built by one person, Tim Kaechle. The screens and numbers on this page are recorded from the running app. There is no release date yet.</p>
+        <p>It needs macOS 26 and Codex or Claude Code installed. Scint runs on the subscription you already have and sells no tokens.</p>
+      </div>
+      <div class="close">
+        <div>
+          <h3>Follow along</h3>
+          <p>Development notes, recordings and early builds as they become runnable.</p>
+          <form class="signup" id="signup-bottom" novalidate>
+            <input id="email-bottom" type="email" name="email" autocomplete="email" placeholder="you@example.com" aria-label="Email address">
+            <button class="btn" id="submit-bottom" type="submit">Get updates</button>
+          </form>
+          <p class="fine" id="note-bottom"></p>
+        </div>
+        <div>
+          <h3>Founding licence</h3>
+          <p>Pay once now and own Scint 1.0 when it ships.</p>
+          <ul class="terms">
+            <li>Builds as they become runnable, before any public beta.</li>
+            <li>No ship date is promised.</li>
+            <li>Refundable on request until the first build reaches you.</li>
+            <li>Below the launch price, for a limited number of licences.</li>
+          </ul>
+          <button class="btn ghost" id="founder" type="button">Become a founder</button>
+          <p class="fine" id="note-founder"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Your spaces and documents stay in files on your Mac. Routing sends the request and the last few messages of its thread to TypeSafe's Jev, and the agents you run talk to their own providers.</p>
+    <p>Scint for macOS</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var tree = document.getElementById('tree');
+  var notes = {
+    read: 'The thread is what you read: three requests and three replies. Each run sits between them as a single line.',
+    kept: 'The branches hold what the runs did: 61 tool calls and the reasoning between them, about 18,000 tokens. They are kept whole and reached from the thread.',
+    carried: 'The space is now in Evaluate, so the next request carries the thread and the latest Evaluate run: about 440 tokens of 18,400. A Compose request would add 1,000 characters from the latest run of each intent.'
+  };
+  var active = { read: ['root'], kept: ['compose', 'evaluate'], carried: ['root', 'evaluate'] };
+  var opened = {};
+
+  function renderTree() {
+    var lens = tree.dataset.lens;
+    tree.querySelectorAll('.seg button').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.dataset.lens === lens));
+    });
+    document.getElementById('lens-note').textContent = notes[lens];
+    tree.querySelectorAll('[data-t]').forEach(function (el) {
+      var on = active[lens].indexOf(el.dataset.t) !== -1;
+      var hollow = lens === 'carried' && !on && el.parentElement.classList.contains('ctx-bar');
+      el.classList.toggle('off', !on && !hollow);
+      el.classList.toggle('hollow', hollow);
+    });
+    tree.querySelectorAll('button.run').forEach(function (run) {
+      var open = lens === 'kept' || (lens === 'read' && opened[run.id] === true);
+      run.setAttribute('aria-expanded', String(open));
+      document.getElementById(run.getAttribute('aria-controls')).hidden = !open;
+    });
+  }
+  tree.querySelectorAll('.seg button').forEach(function (b) {
+    b.addEventListener('click', function () { tree.dataset.lens = b.dataset.lens; renderTree(); });
+  });
+  tree.querySelectorAll('button.run').forEach(function (run) {
+    run.addEventListener('click', function () {
+      if (tree.dataset.lens !== 'read') { tree.dataset.lens = 'read'; opened = {}; }
+      opened[run.id] = !opened[run.id];
+      renderTree();
+    });
+  });
+  renderTree();
+
+  var ap = document.getElementById('aperture');
+  var intents = {
+    compose: { work: 'Arranges work across spaces. It creates them, briefs them, starts and stops them, and reports what is running, finished or stalled.', struct: 'In view: this space, its child spaces and its bridges.', lit: ['own', 'child', 'bridge'], listed: ['documents', 'commands', 'harnesses'], root: 6000, branch: 1000, branchName: 'Each intent’s latest run', branchVal: '1,000 each' },
+    dispatch: { work: 'Carries out one operation that an existing command already does, and returns only the result.', struct: 'In view: no structure. The commands are the whole picture.', lit: [], listed: ['documents', 'commands'], root: 2000, branch: 4000, branchName: 'Latest Dispatch run' },
+    evaluate: { work: 'Open-ended work carried through to a finished result inside the space: writing, analysis, planning, building, fixing.', struct: 'In view: this space and nothing outside it.', lit: ['own'], listed: ['documents', 'commands', 'artifacts'], root: 4000, branch: 6000, branchName: 'Latest Evaluate run' },
+    observe: { work: 'Sets work up to happen later or on a repeat. The task then runs by itself when it comes due, with no one watching.', struct: 'In view: no structure. The task’s own instructions are the brief.', lit: [], listed: ['documents'], root: 4000, branch: 6000, branchName: 'Latest Evaluate run' },
+    search: { work: 'Finds information and reports it, from the web, the library or the file system. Each request stands alone.', struct: 'In view: no structure, and none of the thread.', lit: [], listed: ['documents'], root: 0, branch: 3000, branchName: 'Latest Search run' }
+  };
+  function fmt(n) { return n === 0 ? 'none' : n.toLocaleString('en-US'); }
+  function renderIntent() {
+    var key = ap.dataset.intent, d = intents[key];
+    ['compose', 'dispatch', 'evaluate', 'observe', 'search'].forEach(function (k) { ap.classList.toggle('h-' + k, k === key); });
+    ap.querySelectorAll('.seg button').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.dataset.intent === key));
+    });
+    document.getElementById('ap-work').textContent = d.work;
+    document.getElementById('ap-struct').textContent = d.struct;
+    ['own', 'child', 'bridge'].forEach(function (part) {
+      var on = d.lit.indexOf(part) !== -1;
+      ap.querySelectorAll('.n-' + part + ', .e-' + part).forEach(function (el) { el.classList.toggle('lit', on); });
+    });
+    ap.querySelectorAll('.listed .chip').forEach(function (c) { c.classList.toggle('on', d.listed.indexOf(c.dataset.k) !== -1); c.classList.toggle('off', d.listed.indexOf(c.dataset.k) === -1); });
+    document.getElementById('bar-root').style.width = (d.root / 60) + '%';
+    document.getElementById('val-root').textContent = fmt(d.root);
+    document.getElementById('bar-branch').style.width = (d.branch / 60) + '%';
+    document.getElementById('val-branch').textContent = d.branchVal || fmt(d.branch);
+    document.getElementById('name-branch').textContent = d.branchName;
+  }
+  ap.querySelectorAll('.seg button').forEach(function (b) {
+    b.addEventListener('click', function () { ap.dataset.intent = b.dataset.intent; renderIntent(); });
+  });
+  renderIntent();
+
+  [['signup-top', 'note-top'], ['signup-bottom', 'note-bottom']].forEach(function (pair) {
+    document.getElementById(pair[0]).addEventListener('submit', function (e) {
+      e.preventDefault();
+      document.getElementById(pair[1]).textContent = 'This draft is not connected to a mailing list yet.';
+    });
+  });
+  document.getElementById('founder').addEventListener('click', function () {
+    document.getElementById('note-founder').textContent = 'Payments are not connected in this draft.';
+  });
+})();
+</script>
+</body>
+</html>

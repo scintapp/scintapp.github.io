@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Scint · A space and a structure</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
+<style>
+:root {
+  color-scheme: dark;
+  --ground: #131314;
+  --canvas: #1a1a1b;
+  --surface: #222225;
+  --ink: #f0edef;
+  --ink-2: #cfccce;
+  --muted: #98969a;
+  --faint: #6a686d;
+  --line: rgba(240, 237, 239, 0.1);
+  --line-strong: rgba(240, 237, 239, 0.24);
+  --compose: #c7a3e7;
+  --dispatch: #f9b588;
+  --evaluate: #f1a3ab;
+  --observe: #abe3f3;
+  --search: #b7ecbc;
+  --display: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --body: "Hanken Grotesk", -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --data: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  padding-block: env(safe-area-inset-top, 0px) env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --ground: #f5f3f4;
+    --canvas: #fbfafb;
+    --surface: #ffffff;
+    --ink: #1b1a1c;
+    --ink-2: #3a383c;
+    --muted: #6b686e;
+    --faint: #98959b;
+    --line: rgba(27, 26, 28, 0.11);
+    --line-strong: rgba(27, 26, 28, 0.3);
+    --compose: #7b52b3;
+    --dispatch: #b4601f;
+    --evaluate: #b24553;
+    --observe: #1c7c96;
+    --search: #2c7f45;
+  }
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --ground: #f5f3f4;
+  --canvas: #fbfafb;
+  --surface: #ffffff;
+  --ink: #1b1a1c;
+  --ink-2: #3a383c;
+  --muted: #6b686e;
+  --faint: #98959b;
+  --line: rgba(27, 26, 28, 0.11);
+  --line-strong: rgba(27, 26, 28, 0.3);
+  --compose: #7b52b3;
+  --dispatch: #b4601f;
+  --evaluate: #b24553;
+  --observe: #1c7c96;
+  --search: #2c7f45;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1060px; margin-inline: auto; padding: clamp(24px, 5vw, 56px) clamp(16px, 4vw, 40px); }
+.label { display: flex; align-items: center; gap: 9px; font-family: var(--data); font-size: 12px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+.glyph { width: 11px; height: 11px; border: 1.5px solid currentColor; border-radius: 3.5px; flex: none; }
+figure { margin: 0; display: flex; flex-direction: column; gap: 14px; }
+figcaption { font-size: 14.5px; line-height: 1.5; color: var(--muted); max-width: 70ch; }
+.panel { background: var(--canvas); border: 1px solid var(--line); border-radius: 20px; padding: clamp(16px, 3vw, 28px); }
+.h-compose { --hue: var(--compose); }
+.h-dispatch { --hue: var(--dispatch); }
+.h-evaluate { --hue: var(--evaluate); }
+.h-observe { --hue: var(--observe); }
+.h-search { --hue: var(--search); }
+
+.pair { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 48px); align-items: center; }
+.side { display: flex; flex-direction: column; gap: 20px; min-width: 0; container-type: inline-size; }
+.space { border: 1.5px solid color-mix(in srgb, var(--compose) 55%, transparent); border-radius: 26px; padding: clamp(10px, 1.6vw, 18px); }
+.transcript { background: color-mix(in srgb, var(--compose) 9%, var(--surface)); border: 1px solid var(--line-strong); border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.transcript h3 { margin: 0; text-align: center; font-family: var(--display); font-weight: 400; font-size: 1.45rem; letter-spacing: -0.012em; }
+.branches { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.branch { height: 68px; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 15px; font-weight: 500; background: color-mix(in srgb, var(--hue) 22%, var(--surface)); border: 1px solid color-mix(in srgb, var(--hue) 50%, transparent); }
+.thread { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 6px; }
+.thread span { height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 11px; font-weight: 500; color: var(--ink-2); background: var(--surface); border: 1px solid var(--line-strong); }
+.tree { display: block; width: 100%; height: auto; }
+.tree rect { fill: color-mix(in srgb, var(--hue) 22%, var(--surface)); stroke: color-mix(in srgb, var(--hue) 50%, transparent); stroke-width: 1; }
+.tree text { font-family: var(--body); font-size: 17px; font-weight: 500; fill: var(--ink); text-anchor: middle; }
+.tree path.edge { fill: none; stroke: var(--muted); stroke-width: 1.4; }
+.tree marker path { fill: var(--muted); }
+@container (max-width: 520px) {
+  .thread { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}
+@container (max-width: 420px) {
+  .branches { grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); }
+}
+@media (max-width: 900px) {
+  .pair { grid-template-columns: minmax(0, 1fr); }
+  .tree { max-width: 460px; margin-inline: auto; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <figure>
+    <div class="panel">
+      <div class="pair">
+        <div class="side">
+          <div class="label"><span class="glyph"></span>An individual space</div>
+          <div class="space">
+            <div class="transcript">
+              <h3>Transcript</h3>
+              <div class="branches">
+                <div class="branch h-compose">Compose</div>
+                <div class="branch h-dispatch">Dispatch</div>
+                <div class="branch h-evaluate">Evaluate</div>
+                <div class="branch h-observe">Observe</div>
+                <div class="branch h-search">Search</div>
+              </div>
+              <div class="thread">
+                <span>Input</span><span>Output</span><span>Input</span><span>Output</span><span>Input</span><span>Output</span>
+                <span>Input</span><span>Output</span><span>Input</span><span>Output</span><span>Input</span><span>Output</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="side">
+          <div class="label"><span class="glyph"></span>A structure of spaces</div>
+          <svg class="tree" viewBox="0 0 560 592" role="img" aria-label="A tree of seven spaces. An Observe space holds a Dispatch space and a Compose space. The Compose space holds two Evaluate spaces. The first Evaluate space holds a Dispatch space and a Search space. Arrows run both ways along every link.">
+            <defs>
+              <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                <path d="M0 1.2 L9 5 L0 8.8 z"/>
+              </marker>
+            </defs>
+            <path class="edge" d="M228 86 V124 H102 V158" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+            <path class="edge" d="M228 124 H354 V158" marker-end="url(#arrow)"/>
+            <path class="edge" d="M354 234 V276 H236 V318" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+            <path class="edge" d="M354 276 H472 V318" marker-end="url(#arrow)"/>
+            <path class="edge" d="M236 394 V436 H118 V478" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+            <path class="edge" d="M236 436 H354 V478" marker-end="url(#arrow)"/>
+            <g class="h-observe"><rect x="142" y="12" width="172" height="72" rx="13"/><text x="228" y="54">Observe Space</text></g>
+            <g class="h-dispatch"><rect x="16" y="160" width="172" height="72" rx="13"/><text x="102" y="202">Dispatch Space</text></g>
+            <g class="h-compose"><rect x="268" y="160" width="172" height="72" rx="13"/><text x="354" y="202">Compose Space</text></g>
+            <g class="h-evaluate"><rect x="150" y="320" width="172" height="72" rx="13"/><text x="236" y="362">Evaluate Space</text></g>
+            <g class="h-evaluate"><rect x="386" y="320" width="172" height="72" rx="13"/><text x="472" y="362">Evaluate Space</text></g>
+            <g class="h-dispatch"><rect x="32" y="480" width="172" height="72" rx="13"/><text x="118" y="522">Dispatch Space</text></g>
+            <g class="h-search"><rect x="268" y="480" width="172" height="72" rx="13"/><text x="354" y="522">Search Space</text></g>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <figcaption>Inside one space, activity branches by intent, and every branch belongs to a single thread of inputs and outputs. Across a structure, each space has a thread of its own. A space that searches and a space that hands its input to a search space have the same shape at two scales.</figcaption>
+  </figure>
+</div>
+</body>
+</html>

@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Scint Runtime</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
+<style>
+/* Layout: one reading column for the argument; figures break out to the full wrap. Same tokens as the landing page. */
+:root {
+  color-scheme: dark;
+  --ground: #131314;
+  --canvas: #1a1a1b;
+  --surface: #222225;
+  --ink: #f0edef;
+  --ink-2: #cfccce;
+  --muted: #98969a;
+  --faint: #6a686d;
+  --line: rgba(240, 237, 239, 0.1);
+  --line-strong: rgba(240, 237, 239, 0.24);
+  --compose: #c7a3e7;
+  --dispatch: #f9b588;
+  --evaluate: #f1a3ab;
+  --observe: #abe3f3;
+  --search: #b7ecbc;
+  --display: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --body: "Hanken Grotesk", -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --data: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  padding-block: env(safe-area-inset-top, 0px) env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --ground: #f5f3f4;
+    --canvas: #fbfafb;
+    --surface: #ffffff;
+    --ink: #1b1a1c;
+    --ink-2: #3a383c;
+    --muted: #6b686e;
+    --faint: #98959b;
+    --line: rgba(27, 26, 28, 0.11);
+    --line-strong: rgba(27, 26, 28, 0.3);
+    --compose: #7b52b3;
+    --dispatch: #b4601f;
+    --evaluate: #b24553;
+    --observe: #1c7c96;
+    --search: #2c7f45;
+  }
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --ground: #f5f3f4;
+  --canvas: #fbfafb;
+  --surface: #ffffff;
+  --ink: #1b1a1c;
+  --ink-2: #3a383c;
+  --muted: #6b686e;
+  --faint: #98959b;
+  --line: rgba(27, 26, 28, 0.11);
+  --line-strong: rgba(27, 26, 28, 0.3);
+  --compose: #7b52b3;
+  --dispatch: #b4601f;
+  --evaluate: #b24553;
+  --observe: #1c7c96;
+  --search: #2c7f45;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1060px; margin-inline: auto; padding-inline: clamp(16px, 4vw, 40px); }
+main { display: flex; flex-direction: column; gap: clamp(72px, 11vw, 136px); padding-block: 0 96px; }
+section { display: flex; flex-direction: column; gap: 28px; }
+.prose { max-width: 62ch; display: flex; flex-direction: column; gap: 16px; }
+.prose p { margin: 0; color: var(--ink-2); }
+h1, h2 { font-family: var(--display); font-weight: 400; margin: 0; text-wrap: balance; letter-spacing: -0.018em; }
+h1 { font-size: clamp(2.5rem, 6.4vw, 4.2rem); line-height: 1.02; max-width: 14ch; }
+h2 { font-size: clamp(1.8rem, 3.8vw, 2.7rem); line-height: 1.08; max-width: 20ch; }
+h1 em { font-style: italic; }
+.label { display: flex; align-items: center; gap: 9px; font-family: var(--data); font-size: 12px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+.glyph { width: 11px; height: 11px; border: 1.5px solid currentColor; border-radius: 3.5px; flex: none; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 6px; }
+
+.top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 22px; }
+.mark { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 17px; letter-spacing: -0.01em; text-decoration: none; }
+.mark .glyph { width: 16px; height: 16px; border-width: 2px; border-radius: 5px; }
+.top nav { display: flex; gap: 22px; }
+.top nav a { font-size: 15px; color: var(--muted); text-decoration: none; }
+.top nav a:hover, .top nav a[aria-current="page"] { color: var(--ink); }
+
+.hero { gap: 26px; padding-top: clamp(28px, 6vw, 72px); }
+.lede { font-size: clamp(1.1rem, 1.9vw, 1.3rem); line-height: 1.5; color: var(--ink-2); max-width: 56ch; margin: 0; }
+
+figure { margin: 0; display: flex; flex-direction: column; gap: 14px; }
+figcaption { font-size: 14.5px; line-height: 1.5; color: var(--muted); max-width: 70ch; }
+.panel { background: var(--canvas); border: 1px solid var(--line); border-radius: 20px; padding: clamp(16px, 3vw, 28px); display: flex; flex-direction: column; gap: 22px; }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg button { height: 36px; padding: 0 14px; border-radius: 10px; cursor: pointer; background: transparent; color: var(--muted); border: 1px solid var(--line); font: inherit; font-size: 15px; font-weight: 500; }
+.seg button:hover { color: var(--ink); }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); border-color: var(--line-strong); }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hue, var(--muted)); flex: none; }
+.h-compose { --hue: var(--compose); }
+.h-dispatch { --hue: var(--dispatch); }
+.h-evaluate { --hue: var(--evaluate); }
+.h-observe { --hue: var(--observe); }
+.h-search { --hue: var(--search); }
+.h-none { --hue: var(--faint); }
+.kicker { margin: 0; font-family: var(--data); font-size: 11.5px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+.addr { font-family: var(--data); font-size: 11.5px; color: var(--muted); overflow-wrap: anywhere; }
+.live { color: var(--ink); background: color-mix(in srgb, var(--dispatch) 20%, transparent); border-radius: 4px; padding: 1px 4px; box-decoration-break: clone; -webkit-box-decoration-break: clone; overflow-wrap: anywhere; }
+
+/* identity */
+.source { display: flex; flex-direction: column; gap: 10px; }
+.source label { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 9px; }
+.source label .glyph { color: var(--dispatch); }
+.source input { width: 100%; min-width: 0; height: 46px; padding: 0 14px; background: var(--surface); color: var(--ink); border: 1px solid var(--line-strong); border-radius: 12px; font: inherit; font-size: 16px; }
+.readers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.reader { border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 9px; min-width: 0; }
+.reader p { margin: 0; font-size: 15px; line-height: 1.5; color: var(--ink-2); }
+.reader .nest { border-left: 2px solid var(--dispatch); padding-left: 12px; }
+.reader pre { margin: 0; font-family: var(--data); font-size: 12px; line-height: 1.6; color: var(--ink-2); white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* structure */
+.scroll { overflow-x: auto; }
+.scroll svg { min-width: 600px; }
+svg { width: 100%; height: auto; max-width: 100%; display: block; color: var(--ink); }
+.n rect { fill: var(--surface); stroke: var(--line-strong); stroke-width: 1.2; }
+.n text, .bcard text { fill: currentColor; font-family: var(--body); font-size: 13px; }
+.c-edge { stroke: currentColor; fill: none; stroke-width: 1.3; }
+.b-edge { stroke: var(--compose); fill: none; stroke-width: 1.6; stroke-dasharray: 5 4; }
+.bcard rect { fill: var(--canvas); stroke: var(--compose); stroke-width: 1.3; }
+.elabel { fill: currentColor; font-family: var(--data); font-size: 10.5px; opacity: 0.7; }
+.blabel { fill: var(--compose); font-family: var(--data); font-size: 10.5px; }
+.bcard .small { font-family: var(--data); font-size: 10.5px; fill: var(--compose); }
+.c-edge, .b-edge, .bcard, .elabel, .blabel { transition: opacity 0.2s; }
+[data-view="contain"] .b-edge, [data-view="contain"] .bcard, [data-view="contain"] .blabel { opacity: 0.12; }
+[data-view="bridges"] .c-edge, [data-view="bridges"] .elabel { opacity: 0.12; }
+
+/* documents */
+.blocks { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 0 18px; max-width: 680px; }
+.blocks > * { padding-block: 11px; border-top: 1px solid var(--line); }
+.blocks > :nth-child(-n+2) { border-top: 0; }
+.blocks .type { font-family: var(--data); font-size: 11.5px; letter-spacing: 0.04em; color: var(--muted); padding-top: 14px; }
+.blocks .body { font-size: 15.5px; color: var(--ink-2); min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.blocks .body strong { font-size: 19px; font-weight: 600; color: var(--ink); letter-spacing: -0.01em; }
+.ref { display: inline-flex; align-items: center; gap: 9px; align-self: flex-start; padding: 6px 11px; border-radius: 10px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font-size: 14.5px; max-width: 100%; }
+.ref .glyph { color: var(--dispatch); }
+.box { width: 14px; height: 14px; border: 1.5px solid var(--muted); border-radius: 4.5px; flex: none; }
+.nest { border-left: 2px solid var(--dispatch); padding-left: 12px; }
+
+/* routing */
+.flow .b rect { fill: var(--surface); stroke: var(--line-strong); stroke-width: 1.2; }
+.flow .b.jev rect { stroke: var(--evaluate); stroke-width: 1.6; }
+.flow text { fill: currentColor; font-family: var(--body); font-size: 13px; }
+.flow .mono { font-family: var(--data); font-size: 10.5px; opacity: 0.7; }
+.flow .arrow { stroke: currentColor; fill: none; stroke-width: 1.3; }
+.examples { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 20px; max-width: 680px; font-size: 15.5px; }
+.examples > * { padding-block: 10px; border-top: 1px solid var(--line); }
+.examples > :nth-child(-n+2) { border-top: 0; }
+.examples .q { color: var(--ink-2); min-width: 0; }
+.examples .a { display: flex; align-items: center; gap: 8px; font-weight: 500; white-space: nowrap; }
+
+.by { display: flex; flex-direction: column; gap: 14px; border-top: 1px solid var(--line-strong); padding-top: 28px; }
+.by p { margin: 0; max-width: 62ch; color: var(--ink-2); }
+.link { align-self: flex-start; display: inline-flex; align-items: center; height: 46px; padding: 0 20px; border-radius: 12px; background: var(--ink); color: var(--ground); font-weight: 600; font-size: 16px; text-decoration: none; }
+.link:hover { opacity: 0.88; }
+footer { border-top: 1px solid var(--line); padding-block: 28px 24px; font-size: 14px; color: var(--muted); }
+footer p { margin: 0; max-width: 72ch; }
+
+@media (max-width: 760px) {
+  body { font-size: 16px; }
+  .readers { grid-template-columns: minmax(0, 1fr); }
+  .blocks { grid-template-columns: 78px minmax(0, 1fr); gap: 0 12px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="mark" href="index.html"><span class="glyph"></span>Scint</a>
+    <nav>
+      <a href="runtime.html" aria-current="page">The runtime</a>
+      <a href="index.html#follow">Get updates</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="label"><span class="glyph"></span>The runtime</div>
+      <h1>A workspace built as <em>one</em> graph.</h1>
+      <p class="lede">Under the app is a runtime that gives every space, document, command and conversation an identity, and expresses every relation between them the same way. The app is a set of views over those objects and keeps no second copy of any of them. Four ideas carry most of it.</p>
+    </section>
+
+    <section>
+      <div class="label"><span class="glyph"></span>Identity</div>
+      <h2>Nothing is copied.</h2>
+      <div class="prose">
+        <p>Every object in Scint has one reference, and everything that uses the object holds that reference. A space points to its documents with one. A document points to a document inside it with one. A conversation points to the run behind a reply with one.</p>
+        <p>Nobody holds a copy, so nobody holds a stale one. When an agent edits a document you have open there is nothing to sync, because there is only one document.</p>
+      </div>
+      <figure>
+        <div class="panel">
+          <div class="source">
+            <label for="doc-line"><span class="glyph"></span>Research notes <span class="addr">scint://document/8f2c61d0…</span></label>
+            <input id="doc-line" type="text" value="Offline sync is ready for testing." maxlength="90" autocomplete="off" spellcheck="false" aria-describedby="doc-hint">
+            <p class="kicker" id="doc-hint">Edit the first line of the document</p>
+          </div>
+          <div class="readers">
+            <div class="reader">
+              <p class="kicker">Inside another document</p>
+              <p>Release brief: explain what changed for users.</p>
+              <p class="nest">Research notes<br><span class="live" data-live></span></p>
+              <span class="addr">scint://document/8f2c61d0…</span>
+            </div>
+            <div class="reader">
+              <p class="kicker">In an agent's request</p>
+              <p>Listed by name and address. When the agent reads it, it gets:</p>
+              <p><span class="live" data-live></span></p>
+              <span class="addr">scint://document/8f2c61d0…</span>
+            </div>
+            <div class="reader">
+              <p class="kicker">In a scheduled task</p>
+              <p>Summarize last week's notes, Mondays at 9:00. When it next fires, it reads:</p>
+              <p><span class="live" data-live></span></p>
+              <span class="addr">scint://document/8f2c61d0…</span>
+            </div>
+            <div class="reader">
+              <p class="kicker">On disk</p>
+              <pre>library/documents/8f2c61d0….json
+{ "descriptor": { "name": "Research notes", … },
+  "value": { "blocks": [ …, "<span class="live" data-live></span>" ] } }</pre>
+            </div>
+          </div>
+        </div>
+        <figcaption>One document in five places. Change its first line and every reader shows the change, because each one looks the document up when it needs it. The address is the same everywhere and never changes.</figcaption>
+      </figure>
+      <div class="prose">
+        <p>A reference leaves Scint as a link and comes back as the same object, whether it travelled through a document, a command's arguments or another application. Remove an object and its name stays behind, so a link held elsewhere still says what it pointed to.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="label"><span class="glyph"></span>Structure</div>
+      <h2>Where things belong, and how they relate.</h2>
+      <div class="prose">
+        <p>A project needs a hierarchy and a web of connections, and forcing one into the other bends both. Scint keeps them as two structures over the same spaces. Containment says where a space belongs. Bridges say which spaces work together, and they cross the hierarchy freely.</p>
+        <p>A bridge is more than a line. It holds documents and commands of its own, so the relationship between two spaces carries what their collaboration runs on.</p>
+      </div>
+      <figure>
+        <div class="panel" id="structure" data-view="both">
+          <div class="seg" role="group" aria-label="Choose which structure to show">
+            <button type="button" id="view-contain" data-view="contain" aria-pressed="false">Containment</button>
+            <button type="button" id="view-bridges" data-view="bridges" aria-pressed="false">Bridges</button>
+            <button type="button" id="view-both" data-view="both" aria-pressed="true">Both</button>
+          </div>
+          <div class="scroll">
+            <svg viewBox="0 0 720 320" role="img" aria-label="Five spaces. Release contains Implementation, Editorial and Launch, and Implementation contains Integration QA. One bridge joins Implementation and Editorial and holds a document and a command. A second bridge joins Integration QA and Launch.">
+              <path class="c-edge" d="M360 64V97M140 97H580M140 97V130M360 97V130M580 97V130M140 174V246"/>
+              <text class="elabel" x="372" y="88">contains</text>
+              <text class="elabel" x="152" y="214">contains</text>
+              <path class="b-edge" d="M210 152H290M250 152V196"/>
+              <text class="blabel" x="228" y="143">bridge</text>
+              <path class="b-edge" d="M210 272C400 322 580 300 580 174"/>
+              <text class="blabel" x="470" y="312">bridge</text>
+              <g class="bcard">
+                <rect x="232" y="196" width="178" height="58" rx="11"/>
+                <text class="small" x="246" y="217">held by the bridge</text>
+                <text x="246" y="239">Evidence · Build</text>
+              </g>
+              <g class="n"><rect x="290" y="20" width="140" height="44" rx="11"/><text x="360" y="47" text-anchor="middle">Release</text></g>
+              <g class="n"><rect x="70" y="130" width="140" height="44" rx="11"/><text x="140" y="157" text-anchor="middle">Implementation</text></g>
+              <g class="n"><rect x="290" y="130" width="140" height="44" rx="11"/><text x="360" y="157" text-anchor="middle">Editorial</text></g>
+              <g class="n"><rect x="510" y="130" width="140" height="44" rx="11"/><text x="580" y="157" text-anchor="middle">Launch</text></g>
+              <g class="n"><rect x="70" y="246" width="140" height="44" rx="11"/><text x="140" y="273" text-anchor="middle">Integration QA</text></g>
+            </svg>
+          </div>
+        </div>
+        <figcaption>The same five spaces under two structures. The bridge between Implementation and Editorial holds a document and a command that both sides use. Neither structure had to bend to make room for the other.</figcaption>
+      </figure>
+    </section>
+
+    <section>
+      <div class="label"><span class="glyph"></span>Documents</div>
+      <h2>Content that runs.</h2>
+      <div class="prose">
+        <p>Documents are built from blocks: headings, paragraphs, code, tasks, and references to files, commands and other documents. A block that refers to another document makes documents recursive. A brief can hold the research it depends on, and a second brief can hold the same research.</p>
+        <p>A request in Scint is a document too. Its first block records where it belongs and how it should run, so instructions travel with everything needed to carry them out. One model serves as a page you read, a request you send and a task that fires on a schedule.</p>
+      </div>
+      <figure>
+        <div class="panel" id="doc" data-mode="written">
+          <div class="seg" role="group" aria-label="Choose how to view the document">
+            <button type="button" id="mode-written" data-mode="written" aria-pressed="true">As written</button>
+            <button type="button" id="mode-submitted" data-mode="submitted" aria-pressed="false">As submitted</button>
+          </div>
+          <div class="blocks" id="doc-written">
+            <span class="type">metadata</span><div class="body">Belongs to Editorial. Runs with Claude Code, high effort.</div>
+            <span class="type">heading</span><div class="body"><strong>Release brief</strong></div>
+            <span class="type">paragraph</span><div class="body">Explain what changed for users, in plain language.</div>
+            <span class="type">document</span><div class="body"><span class="ref"><span class="glyph"></span>Research notes</span></div>
+            <span class="type">file</span><div class="body"><span class="ref"><span class="glyph" style="color:var(--observe)"></span>release/</span></div>
+            <span class="type">task</span><div class="body"><span class="ref"><span class="box"></span>Proofread before launch</span></div>
+          </div>
+          <div class="blocks" id="doc-submitted" hidden>
+            <span class="type">runs in</span><div class="body">Editorial</div>
+            <span class="type">runs with</span><div class="body">Claude Code, high effort</div>
+            <span class="type">instructions</span><div class="body"><strong>Release brief</strong>Explain what changed for users, in plain language.<div class="nest">Research notes, read as it stands now:<br><span class="live" data-live></span></div></div>
+            <span class="type">by address</span><div class="body">release/ and Proofread before launch travel as addresses the agent can follow.</div>
+          </div>
+        </div>
+        <figcaption>One document, written once. Submitted to a space, its first block says where and how it runs, and the document it embeds is read as it stands at that moment. The line shown is the one you edited above.</figcaption>
+      </figure>
+    </section>
+
+    <section>
+      <div class="label"><span class="glyph"></span>Routing</div>
+      <h2>One decision, then the work.</h2>
+      <div class="prose">
+        <p>A space works in one intent at a time, and the intent decides what its agent sees. Choosing it is a decision, and Scint treats it as one. Each request goes to Jev, TypeSafe's decision model, which returns a single choice and a confidence. A confident choice switches the space. Anything less leaves the space as it was, and the request runs either way.</p>
+        <p>Routing costs one call and no agent turn. You type into one input for every kind of work.</p>
+      </div>
+      <figure>
+        <div class="panel">
+          <div class="scroll">
+            <svg class="flow" viewBox="0 0 760 200" role="img" aria-label="A request goes to Jev in one call. If Jev's confidence is one half or more, the space switches intent. Otherwise the space keeps its intent. Either way the request runs.">
+              <defs><marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1l6 3-6 3" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+              <path class="arrow" d="M132 100H196" marker-end="url(#ah)"/>
+              <path class="arrow" d="M292 92C340 92 350 52 396 52" marker-end="url(#ah)"/>
+              <path class="arrow" d="M292 108C340 108 350 148 396 148" marker-end="url(#ah)"/>
+              <path class="arrow" d="M602 52C630 52 630 92 656 92" marker-end="url(#ah)"/>
+              <path class="arrow" d="M602 148C630 148 630 108 656 108" marker-end="url(#ah)"/>
+              <g class="b"><rect x="12" y="78" width="120" height="44" rx="11"/><text x="72" y="105" text-anchor="middle">Request</text></g>
+              <g class="b jev"><rect x="200" y="72" width="92" height="56" rx="11"/><text x="246" y="97" text-anchor="middle">Jev</text><text class="mono" x="246" y="114" text-anchor="middle">one call</text></g>
+              <g class="b"><rect x="400" y="24" width="202" height="56" rx="11"/><text x="501" y="49" text-anchor="middle">Space switches intent</text><text class="mono" x="501" y="66" text-anchor="middle">confidence 0.5 or more</text></g>
+              <g class="b"><rect x="400" y="120" width="202" height="56" rx="11"/><text x="501" y="145" text-anchor="middle">Space keeps its intent</text><text class="mono" x="501" y="162" text-anchor="middle">below 0.5, or nothing new</text></g>
+              <g class="b"><rect x="660" y="78" width="88" height="44" rx="11"/><text x="704" y="105" text-anchor="middle">Runs</text></g>
+            </svg>
+          </div>
+          <div>
+            <p class="kicker" style="margin-bottom:8px">The kind of request each intent takes</p>
+            <div class="examples">
+              <span class="q">Split the migration into three workstreams and brief each one.</span><span class="a h-compose"><span class="dot"></span>Compose</span>
+              <span class="q">Run the test suite.</span><span class="a h-dispatch"><span class="dot"></span>Dispatch</span>
+              <span class="q">Why is the login test failing? Fix it.</span><span class="a h-evaluate"><span class="dot"></span>Evaluate</span>
+              <span class="q">Each Monday morning, summarize last week's notes.</span><span class="a h-observe"><span class="dot"></span>Observe</span>
+              <span class="q">Find the documentation for SMAppService.</span><span class="a h-search"><span class="dot"></span>Search</span>
+              <span class="q">Thanks, that works.</span><span class="a h-none"><span class="dot"></span>No change</span>
+            </div>
+          </div>
+        </div>
+        <figcaption>Routing as it runs. Jev answers with a choice among the intents and a confidence. If the call fails, the space keeps its intent and the request still runs.</figcaption>
+      </figure>
+    </section>
+
+    <section class="by">
+      <div class="label"><span class="glyph"></span>Who built it</div>
+      <p>The runtime, the app and its design system are designed and built by one person, Tim Kaechle.</p>
+      <a class="link" href="index.html">See it working</a>
+    </section>
+  </main>
+
+  <footer>
+    <p>Your spaces and documents stay in files on your Mac. Routing sends the request and the last few messages of its thread to TypeSafe's Jev, and the agents you run talk to their own providers.</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var input = document.getElementById('doc-line');
+  function paint() {
+    var text = input.value.trim() || 'Offline sync is ready for testing.';
+    document.querySelectorAll('[data-live]').forEach(function (el) { el.textContent = text; });
+  }
+  input.addEventListener('input', paint);
+  paint();
+
+  var structure = document.getElementById('structure');
+  structure.querySelectorAll('.seg button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      structure.dataset.view = b.dataset.view;
+      structure.querySelectorAll('.seg button').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+    });
+  });
+
+  var doc = document.getElementById('doc');
+  doc.querySelectorAll('.seg button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var mode = b.dataset.mode;
+      doc.dataset.mode = mode;
+      doc.querySelectorAll('.seg button').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+      document.getElementById('doc-written').hidden = mode !== 'written';
+      document.getElementById('doc-submitted').hidden = mode !== 'submitted';
+    });
+  });
+})();
+</script>
+</body>
+</html>
