@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Scint · Flow</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
+<style>
+:root {
+  color-scheme: dark;
+  --ground: #131314;
+  --canvas: #1a1a1b;
+  --surface: #222225;
+  --ink: #f0edef;
+  --ink-2: #cfccce;
+  --muted: #98969a;
+  --faint: #6a686d;
+  --line: rgba(240, 237, 239, 0.1);
+  --line-strong: rgba(240, 237, 239, 0.24);
+  --compose: #c7a3e7;
+  --dispatch: #f9b588;
+  --evaluate: #f1a3ab;
+  --observe: #abe3f3;
+  --search: #b7ecbc;
+  --display: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --body: "Hanken Grotesk", -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --data: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  padding-block: env(safe-area-inset-top, 0px) env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --ground: #f5f3f4;
+    --canvas: #fbfafb;
+    --surface: #ffffff;
+    --ink: #1b1a1c;
+    --ink-2: #3a383c;
+    --muted: #6b686e;
+    --faint: #98959b;
+    --line: rgba(27, 26, 28, 0.11);
+    --line-strong: rgba(27, 26, 28, 0.3);
+    --compose: #7b52b3;
+    --dispatch: #b4601f;
+    --evaluate: #b24553;
+    --observe: #1c7c96;
+    --search: #2c7f45;
+  }
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --ground: #f5f3f4;
+  --canvas: #fbfafb;
+  --surface: #ffffff;
+  --ink: #1b1a1c;
+  --ink-2: #3a383c;
+  --muted: #6b686e;
+  --faint: #98959b;
+  --line: rgba(27, 26, 28, 0.11);
+  --line-strong: rgba(27, 26, 28, 0.3);
+  --compose: #7b52b3;
+  --dispatch: #b4601f;
+  --evaluate: #b24553;
+  --observe: #1c7c96;
+  --search: #2c7f45;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1060px; margin-inline: auto; padding: clamp(24px, 5vw, 56px) clamp(16px, 4vw, 40px); }
+.label { display: flex; align-items: center; gap: 9px; font-family: var(--data); font-size: 12px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+.glyph { width: 11px; height: 11px; border: 1.5px solid currentColor; border-radius: 3.5px; flex: none; }
+figure { margin: 0; display: flex; flex-direction: column; gap: 14px; }
+figcaption { font-size: 14.5px; line-height: 1.5; color: var(--muted); max-width: 70ch; }
+.panel { background: var(--canvas); border: 1px solid var(--line); border-radius: 20px; padding: clamp(16px, 3vw, 28px); display: flex; flex-direction: column; gap: 22px; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 14px; color: var(--ink-2); }
+.legend span { display: flex; align-items: center; gap: 7px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hue, var(--muted)); flex: none; }
+.dot.input { background: var(--canvas); border: 1.5px solid var(--ink); }
+.dot.output { background: var(--ink); }
+.h-compose { --hue: var(--compose); }
+.h-dispatch { --hue: var(--dispatch); }
+.h-evaluate { --hue: var(--evaluate); }
+.h-observe { --hue: var(--observe); }
+.h-search { --hue: var(--search); }
+.readout { font-family: var(--data); font-size: 12.5px; color: var(--muted); min-height: 20px; }
+.flow { display: block; width: 100%; height: auto; cursor: crosshair; touch-action: pan-y; }
+.flow g[data-root] { transition: opacity 0.12s; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <figure>
+    <div class="label"><span class="glyph"></span>The same run, as flow</div>
+    <div class="panel">
+      <div class="legend">
+        <span><i class="dot h-compose"></i>Compose</span>
+        <span><i class="dot h-dispatch"></i>Dispatch</span>
+        <span><i class="dot h-evaluate"></i>Evaluate</span>
+        <span><i class="dot h-observe"></i>Observe</span>
+        <span><i class="dot h-search"></i>Search</span>
+        <span><i class="dot input"></i>Input</span>
+        <span><i class="dot output"></i>Output</span>
+      </div>
+      <svg id="flow" class="flow" viewBox="0 0 980 300" role="img" aria-label="Every input and output of the run on a single line, in the order it happened. An arc joins each input to its output and is coloured by intent. Arcs sit inside other arcs where work was handed on. Activity stacks beneath the line."></svg>
+      <div id="readout" class="readout" aria-live="polite"></div>
+    </div>
+    <figcaption>The same run with the spaces removed as well. Every input and output sits on one line in the order it happened. An arc joins an input to its output, coloured by the intent of the space that held it, so work that was handed on appears as an arc inside an arc. Activity stacks beneath the line, and a taller stack is work running at the same time. Illustrative data.</figcaption>
+  </figure>
+</div>
+<script>
+(function () {
+  var NS = 'http://www.w3.org/2000/svg'
+  var svg = document.getElementById('flow')
+  var readout = document.getElementById('readout')
+  var idle = 'Point at the flow to isolate one root input and everything it caused.'
+  var W = 980, left = 10, right = 10, base = 226
+  var intents = ['compose', 'dispatch', 'evaluate', 'observe', 'search']
+  var spaces = {
+    obs: { lane: 0, intent: 'observe', spaces: ['dis', 'com'] },
+    dis: { lane: 1, intent: 'dispatch', spaces: [] },
+    com: { lane: 2, intent: 'compose', spaces: ['ev1', 'ev2'] },
+    ev1: { lane: 3, intent: 'evaluate', spaces: ['di2', 'sea'] },
+    di2: { lane: 4, intent: 'dispatch', spaces: [] },
+    sea: { lane: 5, intent: 'search', spaces: [] },
+    ev2: { lane: 6, intent: 'evaluate', spaces: [] }
+  }
+
+  var seed = 11
+  function random() {
+    seed |= 0
+    seed = seed + 0x6D2B79F5 | 0
+    var t = Math.imul(seed ^ seed >>> 15, 1 | seed)
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t
+    return ((t ^ t >>> 14) >>> 0) / 4294967296
+  }
+
+  var activities = [], spans = [], roots = []
+  function activity(space, t, count, root) {
+    for (var i = 0; i < count; i++) {
+      var intent = random() < 0.68 ? space.intent : intents[Math.floor(random() * 5)]
+      activities.push({ t: t, intent: intent, root: root })
+      t++
+    }
+    return t
+  }
+  function run(id, t, root, depth) {
+    var space = spaces[id], start = t
+    t = activity(space, t + 1, 2 + Math.floor(random() * 5), root)
+    var children = space.spaces.filter(function () { return random() < 0.85 })
+    if (children.length) {
+      var end = t
+      children.forEach(function (child, index) {
+        var finished = run(child, t + index + 1, root, depth + 1)
+        end = Math.max(end, finished + 1)
+      })
+      t = activity(space, end, 1 + Math.floor(random() * 3), root)
+    }
+    spans.push({ start: start, end: t, intent: space.intent, root: root, depth: depth })
+    return t
+  }
+
+  var clock = 0
+  for (var root = 0; root < 9; root++) {
+    var start = clock
+    clock = run('obs', clock, root, 0)
+    roots.push([start, clock])
+    clock += 3 + Math.floor(random() * 4)
+  }
+  var total = clock
+
+  function x(t) { return left + t / total * (W - left - right) }
+  function add(name, attributes, parent) {
+    var node = document.createElementNS(NS, name)
+    for (var key in attributes) node.setAttribute(key, attributes[key])
+    ;(parent || svg).appendChild(node)
+    return node
+  }
+
+  add('line', { x1: left, x2: W - right, y1: base, y2: base, style: 'stroke:var(--line-strong);stroke-width:1' })
+  var groups = roots.map(function (_, index) { return add('g', { 'data-root': index }) })
+
+  spans.sort(function (a, b) { return (b.end - b.start) - (a.end - a.start) })
+  spans.forEach(function (span) {
+    var x1 = x(span.start), x2 = x(span.end), rx = (x2 - x1) / 2, ry = Math.min(rx * 3.8, 206)
+    add('path', {
+      d: 'M' + x1.toFixed(1) + ' ' + base + ' A' + rx.toFixed(1) + ' ' + ry.toFixed(1) + ' 0 0 1 ' + x2.toFixed(1) + ' ' + base,
+      style: 'fill:color-mix(in srgb, var(--' + span.intent + ') 7%, transparent);stroke:var(--' + span.intent + ');stroke-width:1.4'
+    }, groups[span.root])
+  })
+  spans.forEach(function (span) {
+    add('circle', { cx: x(span.start).toFixed(1), cy: base, r: 2.8, style: 'fill:var(--canvas);stroke:var(--ink);stroke-width:1.3' }, groups[span.root])
+    add('circle', { cx: x(span.end).toFixed(1), cy: base, r: 2.8, style: 'fill:var(--ink)' }, groups[span.root])
+  })
+
+  var stacks = {}
+  activities.forEach(function (event) {
+    var level = stacks[event.t] || 0
+    stacks[event.t] = level + 1
+    add('rect', { x: (x(event.t) - 1.1).toFixed(1), y: base + 9 + level * 10, width: 2.2, height: 8, rx: 1, style: 'fill:var(--' + event.intent + ')' }, groups[event.root])
+  })
+
+  function reset() {
+    groups.forEach(function (group) { group.style.opacity = 1 })
+    readout.textContent = idle
+  }
+  function point(pointer) {
+    var box = svg.getBoundingClientRect()
+    var t = ((pointer.clientX - box.left) / box.width * W - left) / (W - left - right) * total
+    var hit = -1
+    roots.forEach(function (range, index) { if (t >= range[0] - 1 && t <= range[1] + 1) hit = index })
+    if (hit < 0) return reset()
+    groups.forEach(function (group, index) { group.style.opacity = index === hit ? 1 : 0.12 })
+    var own = spans.filter(function (span) { return span.root === hit })
+    var depth = Math.max.apply(null, own.map(function (span) { return span.depth })) + 1
+    var count = activities.filter(function (event) { return event.root === hit }).length
+    readout.textContent = 'Root input ' + (hit + 1) + ' of ' + roots.length + ' · ' + own.length + ' inputs answered · ' + depth + ' deep · ' + count + ' activities'
+  }
+  svg.addEventListener('pointermove', point)
+  svg.addEventListener('pointerleave', reset)
+  reset()
+})()
+</script>
+</body>
+</html>
