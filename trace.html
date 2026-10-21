@@ -18,8 +18,8 @@
   --line: rgba(240, 237, 239, 0.1);
   --line-strong: rgba(240, 237, 239, 0.24);
   --compose: #c7a3e7;
-  --dispatch: #f9b588;
-  --evaluate: #f1a3ab;
+  --evaluate: #f9b588;
+  --process: #f1a3ab;
   --observe: #abe3f3;
   --search: #b7ecbc;
   --display: "Newsreader", "Iowan Old Style", Georgia, serif;
@@ -40,8 +40,8 @@
     --line: rgba(27, 26, 28, 0.11);
     --line-strong: rgba(27, 26, 28, 0.3);
     --compose: #7b52b3;
-    --dispatch: #b4601f;
-    --evaluate: #b24553;
+    --evaluate: #b4601f;
+    --process: #b24553;
     --observe: #1c7c96;
     --search: #2c7f45;
   }
@@ -58,8 +58,8 @@
   --line: rgba(27, 26, 28, 0.11);
   --line-strong: rgba(27, 26, 28, 0.3);
   --compose: #7b52b3;
-  --dispatch: #b4601f;
-  --evaluate: #b24553;
+  --evaluate: #b4601f;
+  --process: #b24553;
   --observe: #1c7c96;
   --search: #2c7f45;
 }
@@ -86,8 +86,11 @@ figcaption { font-size: 14.5px; line-height: 1.5; color: var(--muted); max-width
 .dot.input { background: var(--canvas); border: 1.5px solid var(--ink); }
 .dot.output { background: var(--ink); }
 .h-compose { --hue: var(--compose); }
-.h-dispatch { --hue: var(--dispatch); }
 .h-evaluate { --hue: var(--evaluate); }
+.h-process { --hue: var(--process); }
+.back { margin: 0 0 20px; font-size: 15px; }
+.back a { color: var(--muted); text-decoration: none; }
+.back a:hover { color: var(--ink); }
 .h-observe { --hue: var(--observe); }
 .h-search { --hue: var(--search); }
 .trace { display: block; width: 100%; height: auto; cursor: crosshair; touch-action: pan-y; }
@@ -98,13 +101,14 @@ figcaption { font-size: 14.5px; line-height: 1.5; color: var(--muted); max-width
 </head>
 <body>
 <div class="wrap">
+  <p class="back"><a href="index.html">← Scint case study</a></p>
   <figure>
     <div class="label"><span class="glyph"></span>A retired structure, encoded</div>
     <div class="panel">
       <div class="legend">
         <span><i class="dot h-compose"></i>Compose</span>
-        <span><i class="dot h-dispatch"></i>Dispatch</span>
         <span><i class="dot h-evaluate"></i>Evaluate</span>
+        <span><i class="dot h-process"></i>Process</span>
         <span><i class="dot h-observe"></i>Observe</span>
         <span><i class="dot h-search"></i>Search</span>
         <span><i class="dot input"></i>Input</span>
@@ -123,15 +127,15 @@ figcaption { font-size: 14.5px; line-height: 1.5; color: var(--muted); max-width
   var readout = document.getElementById('readout')
   var idle = 'Point at the trace to isolate one root input and everything it caused.'
   var W = 980, gutter = 118, lane = 50, top = 24, right = 10
-  var intents = ['compose', 'dispatch', 'evaluate', 'observe', 'search']
+  var intents = ['compose', 'evaluate', 'process', 'observe', 'search']
   var spaces = {
     obs: { lane: 0, intent: 'observe', spaces: ['dis', 'com'], name: 'Observe' },
-    dis: { lane: 1, intent: 'dispatch', spaces: [], name: 'Dispatch' },
+    dis: { lane: 1, intent: 'evaluate', spaces: [], name: 'Evaluate' },
     com: { lane: 2, intent: 'compose', spaces: ['ev1', 'ev2'], name: 'Compose' },
-    ev1: { lane: 3, intent: 'evaluate', spaces: ['di2', 'sea'], name: 'Evaluate' },
-    di2: { lane: 4, intent: 'dispatch', spaces: [], name: 'Dispatch' },
+    ev1: { lane: 3, intent: 'process', spaces: ['di2', 'sea'], name: 'Process' },
+    di2: { lane: 4, intent: 'evaluate', spaces: [], name: 'Evaluate' },
     sea: { lane: 5, intent: 'search', spaces: [], name: 'Search' },
-    ev2: { lane: 6, intent: 'evaluate', spaces: [], name: 'Evaluate' }
+    ev2: { lane: 6, intent: 'process', spaces: [], name: 'Process' }
   }
 
   var seed = 11
