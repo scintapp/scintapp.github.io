@@ -18,8 +18,8 @@
   --line: rgba(240, 237, 239, 0.1);
   --line-strong: rgba(240, 237, 239, 0.24);
   --compose: #c7a3e7;
-  --dispatch: #f9b588;
-  --evaluate: #f1a3ab;
+  --evaluate: #f9b588;
+  --process: #f1a3ab;
   --observe: #abe3f3;
   --search: #b7ecbc;
   --display: "Newsreader", "Iowan Old Style", Georgia, serif;
@@ -40,8 +40,8 @@
     --line: rgba(27, 26, 28, 0.11);
     --line-strong: rgba(27, 26, 28, 0.3);
     --compose: #7b52b3;
-    --dispatch: #b4601f;
-    --evaluate: #b24553;
+    --evaluate: #b4601f;
+    --process: #b24553;
     --observe: #1c7c96;
     --search: #2c7f45;
   }
@@ -58,8 +58,8 @@
   --line: rgba(27, 26, 28, 0.11);
   --line-strong: rgba(27, 26, 28, 0.3);
   --compose: #7b52b3;
-  --dispatch: #b4601f;
-  --evaluate: #b24553;
+  --evaluate: #b4601f;
+  --process: #b24553;
   --observe: #1c7c96;
   --search: #2c7f45;
 }
@@ -81,8 +81,8 @@ figure { margin: 0; display: flex; flex-direction: column; gap: 14px; }
 figcaption { font-size: 14.5px; line-height: 1.5; color: var(--muted); max-width: 70ch; }
 .panel { background: var(--canvas); border: 1px solid var(--line); border-radius: 20px; padding: clamp(16px, 3vw, 28px); }
 .h-compose { --hue: var(--compose); }
-.h-dispatch { --hue: var(--dispatch); }
 .h-evaluate { --hue: var(--evaluate); }
+.h-process { --hue: var(--process); }
 .h-observe { --hue: var(--observe); }
 .h-search { --hue: var(--search); }
 
@@ -124,8 +124,8 @@ figcaption { font-size: 14.5px; line-height: 1.5; color: var(--muted); max-width
               <h3>Transcript</h3>
               <div class="branches">
                 <div class="branch h-compose">Compose</div>
-                <div class="branch h-dispatch">Dispatch</div>
                 <div class="branch h-evaluate">Evaluate</div>
+                <div class="branch h-process">Process</div>
                 <div class="branch h-observe">Observe</div>
                 <div class="branch h-search">Search</div>
               </div>
@@ -138,7 +138,7 @@ figcaption { font-size: 14.5px; line-height: 1.5; color: var(--muted); max-width
         </div>
         <div class="side">
           <div class="label"><span class="glyph"></span>A structure of spaces</div>
-          <svg class="tree" viewBox="0 0 560 592" role="img" aria-label="A tree of seven spaces. An Observe space holds a Dispatch space and a Compose space. The Compose space holds two Evaluate spaces. The first Evaluate space holds a Dispatch space and a Search space. Arrows run both ways along every link.">
+          <svg class="tree" viewBox="0 0 560 592" role="img" aria-label="A tree of seven spaces. An Observe space holds an Evaluate space and a Compose space. The Compose space holds two Process spaces. The first Process space holds an Evaluate space and a Search space. Arrows run both ways along every link.">
             <defs>
               <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
                 <path d="M0 1.2 L9 5 L0 8.8 z"/>
@@ -151,11 +151,11 @@ figcaption { font-size: 14.5px; line-height: 1.5; color: var(--muted); max-width
             <path class="edge" d="M236 394 V436 H118 V478" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
             <path class="edge" d="M236 436 H354 V478" marker-end="url(#arrow)"/>
             <g class="h-observe"><rect x="142" y="12" width="172" height="72" rx="13"/><text x="228" y="54">Observe Space</text></g>
-            <g class="h-dispatch"><rect x="16" y="160" width="172" height="72" rx="13"/><text x="102" y="202">Dispatch Space</text></g>
+            <g class="h-evaluate"><rect x="16" y="160" width="172" height="72" rx="13"/><text x="102" y="202">Evaluate Space</text></g>
             <g class="h-compose"><rect x="268" y="160" width="172" height="72" rx="13"/><text x="354" y="202">Compose Space</text></g>
-            <g class="h-evaluate"><rect x="150" y="320" width="172" height="72" rx="13"/><text x="236" y="362">Evaluate Space</text></g>
-            <g class="h-evaluate"><rect x="386" y="320" width="172" height="72" rx="13"/><text x="472" y="362">Evaluate Space</text></g>
-            <g class="h-dispatch"><rect x="32" y="480" width="172" height="72" rx="13"/><text x="118" y="522">Dispatch Space</text></g>
+            <g class="h-process"><rect x="150" y="320" width="172" height="72" rx="13"/><text x="236" y="362">Process Space</text></g>
+            <g class="h-process"><rect x="386" y="320" width="172" height="72" rx="13"/><text x="472" y="362">Process Space</text></g>
+            <g class="h-evaluate"><rect x="32" y="480" width="172" height="72" rx="13"/><text x="118" y="522">Evaluate Space</text></g>
             <g class="h-search"><rect x="268" y="480" width="172" height="72" rx="13"/><text x="354" y="522">Search Space</text></g>
           </svg>
         </div>
