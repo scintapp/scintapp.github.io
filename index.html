@@ -121,6 +121,13 @@ figcaption { font-size: 14.5px; line-height: 1.5; color: var(--muted); max-width
 .facts h3 { margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -0.005em; }
 .facts p { margin: 0; font-size: 16px; color: var(--ink-2); }
 
+/* dimensions */
+.dims { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.dims > div { background: var(--canvas); border: 1px solid var(--line); border-radius: 18px; padding: clamp(16px, 2.4vw, 24px); display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.dims h3 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 1.6rem; letter-spacing: -0.012em; }
+.dims > div > p:not(.kicker) { margin: 0; font-size: 15.5px; line-height: 1.55; color: var(--ink-2); }
+.dims .slice { grid-column: 1 / -1; margin: 0; padding: 12px 16px; border: 1px dashed var(--line-strong); border-radius: 14px; font-size: 15px; line-height: 1.5; color: var(--ink-2); }
+
 /* loop */
 .steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; counter-reset: step; }
 .steps li { counter-increment: step; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 6px; min-width: 0; position: relative; }
@@ -300,7 +307,7 @@ footer p { margin: 0; max-width: 72ch; }
 }
 @media (max-width: 760px) {
   body { font-size: 16px; }
-  .aperture, .facts, .close, .pair-shots { grid-template-columns: minmax(0, 1fr); }
+  .aperture, .facts, .close, .pair-shots, .dims { grid-template-columns: minmax(0, 1fr); }
   .ctx-key { grid-template-columns: minmax(0, 1fr); gap: 10px; }
   .req { max-width: 92%; }
   .rep { max-width: 100%; }
@@ -330,8 +337,8 @@ footer p { margin: 0; max-width: 72ch; }
   <main>
     <section class="hero">
       <div class="label"><span class="glyph"></span>Case study · Context engineering · Tim Kaechle</div>
-      <h1>Context that keeps <em>everything</em>, and shows only what the work needs.</h1>
-      <p class="lede">Scint is an agent workspace I designed and built on my own: a runtime, an MCP server, a process daemon and a native macOS app. This case study covers its central problem, context. It keeps a full record of agent work without ever compacting it, splits each request with TypeSafe's Jev decision model, and builds every run a view shaped by what was asked.</p>
+      <h1>Context as a <em>topology</em>, not a session.</h1>
+      <p class="lede">Scint is an agent workspace I designed and built on my own: a runtime, an MCP server, a process daemon and a native macOS app. This case study covers its central idea: context is topological across two dimensions. Spaces give it structure, each one a context of its own. Transcripts give it history, nested by intent and never compacted. TypeSafe's Jev routes every request, and code maps each run a view across both.</p>
       <div class="glance">
         <div><h3>Role</h3><p>Sole designer and engineer, from runtime to interface</p></div>
         <div><h3>Built</h3><p>Runtime, MCP server, XPC process daemon, native app, design system</p></div>
@@ -340,7 +347,7 @@ footer p { margin: 0; max-width: 72ch; }
       </div>
       <figure class="window">
         <img src="images/editor.webp" width="2000" height="1280" alt="The Scint window. A newsletter issue is open in the block editor with the slash menu showing Task, Link, headings, lists, checklist, quote and code block. An embedded document card sits below the text, and the inspector shows the issue's outline and the document it references.">
-        <figcaption>A document in Scint's block editor, with the slash menu open. Documents like this one are what agents read by live link; what the agents did is kept in each space's transcript. The rest of this page explains how the two meet in every request.</figcaption>
+        <figcaption>A document in Scint's block editor, with the slash menu open. The sidebar is the first dimension: spaces, each holding documents like this one by live link. The second is out of view: every space's transcript of what its agents did. The rest of this page explains how a request is mapped across both.</figcaption>
       </figure>
     </section>
 
@@ -363,20 +370,39 @@ footer p { margin: 0; max-width: 72ch; }
 
     <section id="approach">
       <div class="label"><span class="no">02</span>The approach</div>
-      <h2>Record, classify, map, run, record.</h2>
+      <h2>Two dimensions, one loop.</h2>
       <div class="prose">
-        <p>Every space in Scint (a project, a folder of work, a long-running job) has one transcript and a queue. A request moves through the same five steps no matter where it came from.</p>
+        <p>A session has one axis: time, in a single thread that grows until it is compacted. Scint gives context two. <strong>Spaces</strong> say where context lives. <strong>Transcripts</strong> say what happened there. Neither is ever thrown away, and no request receives all of either.</p>
+      </div>
+      <figure>
+        <div class="dims">
+          <div>
+            <p class="kicker">Dimension one · Where</p>
+            <h3>Spaces</h3>
+            <p>The structure of the work: projects, folders, long-running jobs. Each space is its own context, with its own documents, commands, provider, queue and transcript, and any space can run an agent. Spaces nest inside one another and link through bridges, so delegating creates a place instead of a summary.</p>
+          </div>
+          <div>
+            <p class="kicker">Dimension two · What happened</p>
+            <h3>Transcripts</h3>
+            <p>The history of the work. Inside every space, one transcript keeps each request, reply and lifecycle signal, with a nested transcript per intent holding the tool calls, reasoning and output behind them. Nothing is compacted.</p>
+          </div>
+          <p class="slice">A request takes a slice of each: the spaces its intent can see, from Compose's space, children and bridges down to Process's single space, and the transcripts it excerpts, with how much of each.</p>
+        </div>
+        <figcaption>Context in Scint is topological. Where a request lands in the structure, and what kind of work it is, decide which part of the graph and which part of the record it sees.</figcaption>
+      </figure>
+      <div class="prose">
+        <p>A request moves through the same five steps no matter where it came from.</p>
       </div>
       <figure>
         <ol class="steps">
-          <li><b>Submit</b><span>The request is a document, placed in the space's queue.</span></li>
+          <li><b>Submit</b><span>The request is a document, placed in a space's queue.</span></li>
           <li><b>Classify</b><span>Jev reads it with the last few messages and picks an intent.</span></li>
-          <li><b>Map</b><span>Code builds the view for that intent from the record and the space.</span></li>
+          <li><b>Map</b><span>Code builds the intent's view across the visible spaces and their transcripts.</span></li>
           <li><b>Run</b><span>The intent's method supplies a command. A model run starts fresh on the view.</span></li>
-          <li><b>Record</b><span>Output is parsed into Scint's own entries in that intent's transcript.</span></li>
-          <li class="back"><span>The next request is classified and mapped against a record that now includes this run.</span></li>
+          <li><b>Record</b><span>Output is parsed into Scint's own entries in that space's intent transcript.</span></li>
+          <li class="back"><span>The next request is classified and mapped against spaces and records that now include this run.</span></li>
         </ol>
-        <figcaption>The loop every request takes. The model sees a view; the record behind it only grows.</figcaption>
+        <figcaption>The loop every request takes. The model sees a slice of both dimensions; the spaces and records behind it persist.</figcaption>
       </figure>
     </section>
 
