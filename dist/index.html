@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Scint Case Study</title>
-<meta name="description" content="A case study in context engineering: an agent workspace that keeps a full record, routes every request with TypeSafe's Jev, and maps a bounded view for each run.">
+<meta name="description" content="A case study in context engineering: an agent workspace that keeps its whole record, routes every request with TypeSafe's Jev, and hands each run a bounded view built for the job.">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
 <style>
 :root {
@@ -336,7 +336,7 @@ footer p { margin: 0; max-width: 72ch; }
     <section class="hero">
       <div class="label"><span class="glyph"></span>Case study · Context engineering · Tim Kaechle</div>
       <h1>Context as a <em>topology</em>, not a session.</h1>
-      <p class="lede">Scint is an agent workspace I designed and built on my own: a runtime, an MCP server, a process daemon and a native macOS app. Its central idea: you don't open a thread, you create a space. The space becomes the focal point of context. Its interactions split by intent into a hierarchy of transcripts that is the source of truth, and each request is classified by TypeSafe's Jev to decide which mapping over that record the agent sees. Spaces are hierarchical too, so delegated work becomes a sub-space that persists.</p>
+      <p class="lede">Scint is an agent workspace I designed and built on my own: a runtime, an MCP server, a process daemon and a native macOS app. The premise is simple enough. You don't open a thread—you create a space, and that space becomes the focal point for the work's context. What happens inside it splits by intent into a hierarchy of transcripts, and TypeSafe's Jev classifies each request to decide which slice of that record the agent gets to see. Spaces nest, too, so when an agent delegates, the work lands in a sub-space that sticks around.</p>
       <div class="glance">
         <div><h3>Role</h3><p>Sole designer and engineer, from runtime to interface</p></div>
         <div><h3>Built</h3><p>Runtime, MCP server, XPC process daemon, native app, design system</p></div>
@@ -345,24 +345,24 @@ footer p { margin: 0; max-width: 72ch; }
       </div>
       <figure class="window">
         <img src="images/editor.webp" width="2000" height="1280" alt="The Scint window. A newsletter issue is open in the block editor with the slash menu showing Task, Link, headings, lists, checklist, quote and code block. An embedded document card sits below the text, and the inspector shows the issue's outline and the document it references.">
-        <figcaption>A document in Scint's block editor, with the slash menu open. The sidebar is the first dimension: spaces, each holding documents like this one by live link. The second is out of view: every space's transcript of what its agents did. The rest of this page explains how a request is mapped across both.</figcaption>
+        <figcaption>A document in Scint's block editor, slash menu open. The sidebar is the first dimension: spaces, each holding documents like this one by live link. The second is out of frame—every space's transcript of what its agents did. The rest of this page is about how a request gets mapped across both.</figcaption>
       </figure>
     </section>
 
     <section id="problem">
       <div class="label"><span class="no">01</span>The problem</div>
-      <h2>Threads get used until they stop working, then thrown away.</h2>
+      <h2>Threads get used until they break, then thrown away.</h2>
       <div class="prose">
-        <p>The usual way to work with an agent is to open a thread and keep using it until it stops working. A loop hands the model its message history, the model calls tools, and the history grows. Models get worse at using a long context well before the window is full, and the standard fix is compaction: summarize what came before and carry on. Summaries drop the subgoal that was in progress and the constraint that mattered. Eventually the thread is abandoned for a new one, and a sub-agent's work comes back as a paragraph from an agent you never see.</p>
-        <p>Scint replaces the thread with a space. You create a space instead of opening a thread, and it becomes the focal point of the context for that work. It keeps everything, splits what happens in it by intent, and gives each request a view chosen for the kind of work being asked for.</p>
+        <p>If you work with agents, you know the drill. You open a thread and keep using it until it stops working. Under the hood, a loop hands the model its message history, the model calls tools, and the history grows. But models get worse at using a long context well before the window is full, so the standard fix is compaction: summarize what came before and carry on. Which works, more or less, until the summary drops the subgoal you were halfway through or the one constraint that mattered. Eventually the thread gets abandoned for a fresh one, and any sub-agent's work comes back as a paragraph from an agent you never got to see.</p>
+        <p>Scint swaps the thread for a space. Instead of opening a thread, you create a space, and it becomes the focal point of the context for that work. It keeps everything, splits what happens inside it by intent, and gives each request a view picked for the kind of work being asked for.</p>
       </div>
       <div class="facts">
-        <div><h3>The space is the unit</h3><p>Work starts by creating a space, not a thread. The space holds the documents, commands and record for that work, and it stays.</p></div>
-        <div><h3>Split by intent</h3><p>The ongoing conversation stays in the space's root transcript. Each kind of agent work is split out into its own nested transcript.</p></div>
-        <div><h3>Keep the whole record</h3><p>Every request, reply, tool call, reasoning step and error is stored. The transcript hierarchy is the source of truth, and nothing is compacted.</p></div>
-        <div><h3>Map, don't carry</h3><p>Each request is classified, and the classification decides the mapping over that record the agent sees, so the last request starts as light as the first.</p></div>
-        <div><h3>Delegate into places</h3><p>When a space needs a sub-agent, it creates a sub-space with the same transcript pattern. Sub-spaces persist, and you can open them.</p></div>
-        <div><h3>Refine the space over time</h3><p>Documents, commands and links to other spaces can be assigned to a space directly or passed in through its input, so the space gets better at its work.</p></div>
+        <div><h3>The space is the unit</h3><p>Work starts with a space. It holds the documents, commands and record for that work, and it doesn't go anywhere.</p></div>
+        <div><h3>Split by intent</h3><p>The conversation lives in the space's root transcript. Each kind of agent work gets split out into a nested transcript of its own.</p></div>
+        <div><h3>Keep the whole record</h3><p>Every request, reply, tool call, reasoning step and error gets stored. The transcript hierarchy is the source of truth, and nothing is ever compacted.</p></div>
+        <div><h3>Map, don't carry</h3><p>Each request is classified, and that classification decides which slice of the record the agent sees. In other words, the last request starts out as light as the first.</p></div>
+        <div><h3>Delegate into places</h3><p>When a space needs a sub-agent, it creates a sub-space with the same transcript pattern. Sub-spaces persist, and you can open any of them.</p></div>
+        <div><h3>Refine the space over time</h3><p>Assign documents, commands and links to other spaces directly, or pass them in through the input. Over time, the space gets better at its job.</p></div>
       </div>
     </section>
 
@@ -370,37 +370,37 @@ footer p { margin: 0; max-width: 72ch; }
       <div class="label"><span class="no">02</span>The approach</div>
       <h2>Two dimensions, one loop.</h2>
       <div class="prose">
-        <p>A thread has one axis: time, in a single history that grows until it is compacted. With the space as the focal point, context gets two. <strong>Spaces</strong> say where context lives, and they nest. <strong>Transcripts</strong> say what happened there, and they nest too. Neither is ever thrown away, and no request receives all of either.</p>
+        <p>A thread has exactly one axis: time. It's a single history that grows until something compacts it. Make the space the focal point, though, and context picks up a second one. <strong>Spaces</strong> say where context lives, and they nest. <strong>Transcripts</strong> say what happened there, and they nest too. Neither gets thrown away, and no request ever receives all of either.</p>
       </div>
       <figure>
         <div class="dims">
           <div>
             <p class="kicker">Dimension one · Where</p>
             <h3>Spaces</h3>
-            <p>The structure of the work. Each space is its own context, with its own documents, commands, provider, queue and transcript, and any space can run an agent. Spaces nest and link through bridges. When a space working in Compose needs a sub-agent, it creates a sub-space with the same transcript pattern, and that sub-space persists.</p>
+            <p>The structure of the work. Each space is a context unto itself, with its own documents, commands, provider, queue and transcript, and any of them can run an agent. Spaces nest and link to one another through bridges. When a space working in Compose needs a sub-agent, it creates a sub-space with the same transcript pattern, and that sub-space stays put.</p>
           </div>
           <div>
             <p class="kicker">Dimension two · What happened</p>
             <h3>Transcripts</h3>
-            <p>The history of the work. The ongoing conversation stays in the space's root transcript. An agent's work is split out by intent into nested transcripts holding its tool calls, reasoning and output. The hierarchy is the source of truth, and nothing is compacted.</p>
+            <p>The history of the work. The ongoing conversation lives in the space's root transcript, while an agent's work splits out by intent into nested transcripts that hold its tool calls, reasoning and output. The hierarchy is the record, and nothing in it gets summarized away.</p>
           </div>
-          <p class="slice">Each request is classified, and its intent decides the mapping over both: the spaces it can see, from Compose's space, children and bridges down to Process's single space, and which transcripts it excerpts, with how much of each.</p>
+          <p class="slice">Each request gets classified, and its intent decides the mapping over both: which spaces it can see (anywhere from Compose's space, children and bridges down to Process's single space), which transcripts it excerpts, and how much of each.</p>
         </div>
-        <figcaption>Context in Scint is topological. Where a request lands in the structure, and what kind of work it is, decide which part of the graph and which part of the record it sees.</figcaption>
+        <figcaption>Put simply, context in Scint is topological. Where a request lands in the structure and what kind of work it is decide which part of the graph, and which part of the record, it gets to see.</figcaption>
       </figure>
       <div class="prose">
-        <p>A request moves through the same five steps no matter where it came from.</p>
+        <p>No matter where a request comes from, it takes the same five steps.</p>
       </div>
       <figure>
         <ol class="steps">
-          <li><b>Submit</b><span>The request is a document, placed in a space's queue.</span></li>
+          <li><b>Submit</b><span>The request is a document. It goes into a space's queue.</span></li>
           <li><b>Classify</b><span>Jev reads it with the last few messages and picks an intent.</span></li>
-          <li><b>Map</b><span>Code builds the intent's view across the visible spaces and their transcripts.</span></li>
-          <li><b>Run</b><span>The intent's method supplies a command. A model run starts fresh on the view.</span></li>
-          <li><b>Record</b><span>Output is parsed into Scint's own entries in that space's intent transcript.</span></li>
-          <li class="back"><span>The next request is classified and mapped against spaces and records that now include this run.</span></li>
+          <li><b>Map</b><span>Plain code builds the intent's view across the visible spaces and their transcripts.</span></li>
+          <li><b>Run</b><span>The intent's method supplies a command, and a model run starts fresh on that view.</span></li>
+          <li><b>Record</b><span>Output gets parsed into Scint's own entries in the space's intent transcript.</span></li>
+          <li class="back"><span>Then the next request is classified and mapped against spaces and records that now include this run.</span></li>
         </ol>
-        <figcaption>The loop every request takes. The model sees a slice of both dimensions; the spaces and records behind it persist.</figcaption>
+        <figcaption>The loop every request takes. The model only ever sees a slice of both dimensions, while the spaces and records behind it stay where they are.</figcaption>
       </figure>
     </section>
 
@@ -408,9 +408,9 @@ footer p { margin: 0; max-width: 72ch; }
       <div class="label"><span class="no">03</span>The record</div>
       <h2>One transcript per space, nested by intent.</h2>
       <div class="prose">
-        <p>A space's transcript is the source of truth. Requests and replies go into it, along with lifecycle signals for every run. Inside it, each intent keeps its own nested transcript: Compose, Process, Evaluate, Observe and Search. That is where each kind of work's invocations, tool calls, reasoning, output and errors build up.</p>
-        <p>A person reads one short conversation per space and never manages sessions or threads. The full working detail is one step away, attached to the conversation at the point where each run happened.</p>
-        <p>The split is what lets a space last. The conversation grows slowly, because agent work goes to the nested transcripts instead of piling into it. A space can stay in use far longer than a thread kept alive with compaction, and it stays the place where that work happens.</p>
+        <p>Every space has a transcript, and it's the final word on what happened there. Requests and replies go into it, along with lifecycle signals for every run. Inside it, each intent keeps a nested transcript of its own: Compose, Process, Evaluate, Observe and Search. That's where the invocations, tool calls, reasoning, output and errors for each kind of work pile up.</p>
+        <p>As a person, you read one short conversation per space, and you never manage sessions or threads. The full working detail is one step away, attached to the conversation right where each run happened.</p>
+        <p>That split is what lets a space last. The conversation grows slowly, because agent work goes into the nested transcripts instead of piling up in it. Which means a space can stay in use far longer than a thread kept on life support with compaction—and it remains the place where that work happens.</p>
       </div>
       <figure>
         <div class="panel">
@@ -459,7 +459,7 @@ footer p { margin: 0; max-width: 72ch; }
             </div>
           </div>
         </div>
-        <figcaption>Inside one space, the record branches by intent, and every branch hangs off a single conversation of inputs and outputs. Across a structure, each space has a record of its own. A space that searches and a space that hands its input to a search space have the same shape at two scales.</figcaption>
+        <figcaption>Inside one space, the record branches by intent, and every branch hangs off a single conversation of inputs and outputs. Zoom out to a structure, and each space has a record of its own. A space that searches and a space that hands its input to a search space are the same shape at two different scales.</figcaption>
       </figure>
 
       <figure>
@@ -517,19 +517,19 @@ footer p { margin: 0; max-width: 72ch; }
             <div class="rep carried">"Atlas" came from two associations: a map that organizes a complex landscape, and the mythic Atlas carrying a large interconnected system.</div>
           </div>
         </div>
-        <figcaption>A recorded conversation with one space, three requests long, recorded on an earlier build and shown with today's intent names. The bar is everything the space has stored, split by transcript. Switch views to compare what a person reads, what the record keeps, and what the next request is given.</figcaption>
+        <figcaption>A real conversation with one space, three requests long. I recorded it on an earlier build, and it's shown here with today's intent names. The bar is everything the space has stored, split by transcript. Switch views to compare what you read, what the record keeps, and what the next request gets.</figcaption>
       </figure>
       <div class="prose">
-        <p>The runs that built this project spent about 18,000 tokens across 61 tool calls. The conversation they left behind is about 420. Nothing was summarized away: every call is still in the Compose transcript, whole, and reachable. The space's inspector shows the same split live, with an estimate of stored context, each intent's share and run count, tool calls and total run time.</p>
+        <p>The runs that built this project spent about 18,000 tokens across 61 tool calls. The conversation they left behind? About 420. And nothing was summarized away: every call is still sitting in the Compose transcript, whole and reachable. The space's inspector shows the same split live, with an estimate of stored context, each intent's share and run count, tool calls and total run time.</p>
       </div>
     </section>
 
     <section id="routing">
       <div class="label"><span class="no">04</span>Routing</div>
-      <h2>A decision model splits the work.</h2>
+      <h2>One question before every run.</h2>
       <div class="prose">
-        <p>Before any agent runs, Scint asks one question: which intent should handle this request? It sends the question to <strong>Jev</strong>, TypeSafe's decision model, which answers with a typed choice, a confidence and a probability for each option instead of prose. That one call decides which transcript the run works in, what the agent will see, and which command runs.</p>
-        <p>The state Jev decides on is structured data, not a prompt: the request, the last six messages of the conversation, and a routing guide that describes each intent by the work it does, what it sees, the requests it takes, what it is not, and examples. Jev can also choose none, for greetings, acknowledgements and small follow-ups, and the space keeps its current intent. A request can name its intent outright and skip the call. If the call fails, the space keeps its intent and the request runs anyway.</p>
+        <p>Which intent should handle this request? Scint asks before any agent runs, and it puts the question to <strong>Jev</strong>, TypeSafe's decision model. Jev doesn't answer in prose. It returns a typed choice, a confidence and a probability for each option. That one call decides which transcript the run works in, what the agent gets to see, and which command runs.</p>
+        <p>What Jev decides on is structured data rather than a prompt: the request, the last six messages of the conversation, and a routing guide that describes each intent by the work it does, what it sees, the requests it takes, what it isn't, and a few examples. Jev can also choose none—for greetings, thank-yous and small follow-ups—and the space keeps its current intent. A request can name its intent outright and skip the call entirely. And if the call fails? The space keeps its intent, and the request runs anyway.</p>
       </div>
       <figure>
         <div class="panel flow">
@@ -560,7 +560,7 @@ footer p { margin: 0; max-width: 72ch; }
             </div>
           </div>
         </div>
-        <figcaption>Routing as it runs. The examples are the ones in Scint's routing guide. Jev routes by the kind of work, not the topic: one topic can need any intent.</figcaption>
+        <figcaption>Routing as it runs, with examples taken straight from Scint's routing guide. Jev routes by the kind of work rather than the topic, since one topic can call for any intent.</figcaption>
       </figure>
       <div class="guide" aria-label="What each intent does">
         <div class="h-compose"><b>Compose</b><span>Arranges work across spaces: creates, briefs, starts and checks on them.</span></div>
@@ -573,10 +573,10 @@ footer p { margin: 0; max-width: 72ch; }
 
     <section id="mapping">
       <div class="label"><span class="no">05</span>Mapping</div>
-      <h2>Code, not a model, builds what the agent sees.</h2>
+      <h2>What the agent sees is built in plain code.</h2>
       <div class="prose">
-        <p>Once the intent is chosen, Scint builds the starting view entirely in code. No second model pass summarizes or curates memory. Each intent has its own mapping over the most recent context: which structure is visible, which commands and documents are listed, and how much of which transcripts is excerpted.</p>
-        <p>What an intent records and what it reads are separate choices. Observe keeps its own transcript, but its view draws on the shared conversation and Process's history. Compose sees broadly and shallowly; Process sees narrowly and deeply.</p>
+        <p>Once the intent is settled, Scint builds the starting view entirely in code. There's no second model pass summarizing or curating memory behind the scenes. Instead, each intent has its own mapping over the most recent context: which structure is visible, which commands and documents get listed, and how much of which transcripts gets excerpted.</p>
+        <p>What an intent records and what it reads are separate choices, too. Observe keeps a transcript of its own, for example, but its view draws on the shared conversation and Process's history. Compose sees wide and shallow. Process sees narrow and deep.</p>
       </div>
 
       <figure>
@@ -625,7 +625,7 @@ footer p { margin: 0; max-width: 72ch; }
             </div>
           </div>
         </div>
-        <figcaption>What an agent is shown at the start of a request, by intent. The limits are the ones in the code today and are still being tuned. Excerpts take the most recent messages that fit.</figcaption>
+        <figcaption>What an agent is shown at the start of a request, by intent. These limits come straight from the code as it stands today, and I'm still tuning them. Excerpts take the most recent messages that fit.</figcaption>
       </figure>
 
       <figure>
@@ -638,7 +638,7 @@ footer p { margin: 0; max-width: 72ch; }
           <li class="mapped"><b>Thread</b><span>Excerpts in a fixed order: the shared conversation, then the Compose, Evaluate, Process and Search transcripts, each within its intent's budget.</span></li>
           <li><b>Request</b><span>The message itself, rendered from its document.</span></li>
         </ol>
-        <figcaption>The anatomy of a request as the agent receives it. The marked sections come from the intent's mapping; the rest is fixed. The view lists the documents rather than including them, so no request has to carry every document's contents.</figcaption>
+        <figcaption>The anatomy of a request, as the agent receives it. The marked sections come from the intent's mapping, and the rest is fixed. Note that the view lists documents instead of including them, so no request ever has to haul around every document's contents.</figcaption>
       </figure>
 
       <figure class="day">
@@ -660,7 +660,7 @@ footer p { margin: 0; max-width: 72ch; }
             <text class="t-data" x="60" y="20">history over a day of requests</text>
           </svg>
         </div>
-        <figcaption>A schematic, not a measurement. A session carries its whole history until it fills the window and is compacted. A Scint space's record keeps growing and is never summarized, while each request receives a view inside its intent's budget. That is why a space can stay in use long after a thread would have been replaced.</figcaption>
+        <figcaption>This one's a schematic, not a measurement. A session carries its whole history until it fills the window and gets compacted. A Scint space's record keeps growing and is never summarized, while each request receives a view that fits inside its intent's budget. That's why a space can stay in use long after a thread would've been retired.</figcaption>
       </figure>
     </section>
 
@@ -668,8 +668,8 @@ footer p { margin: 0; max-width: 72ch; }
       <div class="label"><span class="no">06</span>Documents</div>
       <h2>The record is what happened. Documents are where the work stands.</h2>
       <div class="prose">
-        <p>The transcript and the documents give two different kinds of continuity. The transcript records experience; documents hold the current state of the work. A request combines both. Update a style guide, and the next request reads the new version while the conversation that led to the change stays exactly as it was.</p>
-        <p>Every object in the runtime has one identity, and every relation is a reference to it. A document can sit in any number of folders and spaces and still be one document. It can embed other documents, files, links and commands by reference. When an agent edits a document someone has open, they watch it change, because there is no copy to sync. The <a href="runtime.html#identity">architecture notes</a> show this in action.</p>
+        <p>Transcripts and documents offer two different kinds of continuity. The transcript records experience, documents hold the current state of the work, and a request draws on both. Say you update a style guide. The next request reads the new version, while the conversation that led to the change stays exactly as it was.</p>
+        <p>Every object in the runtime has exactly one identity, and every relation is a reference to it. So a document can sit in any number of folders and spaces and still be one document. It can also embed other documents, files, links and commands by reference. And when an agent edits a document you have open, you watch it change, because there's no copy to sync. The <a href="runtime.html#identity">architecture notes</a> let you try it for yourself.</p>
       </div>
       <div class="pair-shots">
         <figure class="window">
@@ -678,38 +678,38 @@ footer p { margin: 0; max-width: 72ch; }
         </figure>
         <figure class="window">
           <img src="images/library.webp" width="2000" height="1280" loading="lazy" alt="The Scint library: a grid of document cards, each showing a live, scaled-down rendering of the document's blocks.">
-          <figcaption>The library. Each card renders the document's actual blocks, scaled down, rather than a stored thumbnail.</figcaption>
+          <figcaption>The library. Each card is a scaled-down render of the document's actual blocks rather than a stored thumbnail.</figcaption>
         </figure>
       </div>
     </section>
 
     <section id="requests">
       <div class="label"><span class="no">07</span>Requests</div>
-      <h2>Every request is a document, and a space is refined through them.</h2>
+      <h2>Every request is a document, and documents are how a space gets better.</h2>
       <div class="prose">
-        <p>The message box at the bottom of a space is the same block editor used for documents. Its body carries instructions and references; its header carries execution settings such as the command and its model and effort. When a message is sent, the space's queue prepares the next draft and carries those settings forward.</p>
-        <p>The same component system is how a space gets better at its work over time. Documents, commands, files and links to other spaces can be assigned to a space directly, so they become part of its context for every request whose mapping lists them. Or they can be passed in through the input, embedded in a single message for that run. Either way, the space is refined with the same blocks people write with every day.</p>
-        <p>Tasks are documents too. They live together in Agenda, and each has a schedule, the space it works in, and the command that runs it. A task does one thing: when it comes due, it dispatches to its space as a request, exactly like a message typed there. That space classifies and maps it against its own record and documents, and the run joins its transcript.</p>
+        <p>The message box at the bottom of a space is the same block editor you use for documents. Its body carries instructions and references, and its header carries execution settings like the command, model and effort. Send a message, and the space's queue prepares the next draft with those settings carried forward.</p>
+        <p>That same component system is how a space gets better at its work over time. You can assign documents, commands, files and links to other spaces directly, so they become part of its context for every request whose mapping lists them. Or you can pass them in through the input, embedded in a single message for that one run. Either way, you refine the space with the same blocks you write with every day.</p>
+        <p>Tasks are documents, too. They live together in Agenda, and each one has a schedule, the space it works in, and the command that runs it. A task does exactly one thing: when it comes due, it dispatches to its space as a request, just like a message typed there. The space classifies and maps it against its own record and documents, and the run joins its transcript like any other.</p>
       </div>
       <figure class="window">
         <img src="images/task.webp" width="2000" height="1280" loading="lazy" alt="A Scint task titled Outline Friday's Issue, scheduled for tomorrow at 16:00, targeting the Newsletter space with Claude Code. Its instructions embed the Story Backlog and the Newsletter Style Guide. The inspector shows schedule, space, command, model, effort and sandbox settings.">
-        <figcaption>"Outline Friday's Issue" dispatches to Newsletter and embeds the Story Backlog and the Newsletter Style Guide by reference. When it runs, the agent reads both as they stand that day, along with a view of Newsletter's accumulated work shaped for that request.</figcaption>
+        <figcaption>"Outline Friday's Issue" dispatches to Newsletter and embeds the Story Backlog and the Newsletter Style Guide by reference. When it runs, the agent reads both as they stand that day, plus a view of Newsletter's accumulated work, shaped for that particular request.</figcaption>
       </figure>
       <div class="prose">
-        <p>A message typed into a space, a task that comes due, one space briefing another, an MCP compose call and a <code>scint://</code> callback URL from another app all arrive the same way: as a document submitted to a space. Every run is queued, recorded and handled by the same rules, whoever asked.</p>
+        <p>A message typed into a space, a task that comes due, one space briefing another, an MCP compose call, a <code>scint://</code> callback URL from another app—they all arrive the same way, as a document submitted to a space. Whoever's asking, every run is queued, recorded and handled by the same rules.</p>
       </div>
     </section>
 
     <section id="orchestration">
       <div class="label"><span class="no">08</span>Orchestration</div>
-      <h2>Delegation creates a place, not a summary.</h2>
+      <h2>Delegated work gets a place of its own.</h2>
       <div class="prose">
-        <p>Most harnesses create a sub-agent, collect its answer, and throw it away without ever showing it to you; the context it spent is gone. In Scint, spaces are hierarchical. When a space, usually one working in Compose, decides a sub-agent is needed, it creates a sub-space (a whole tree in one call if needed), briefs it and starts it. The sub-space uses the same transcript pattern: its own conversation, its own nested transcripts by intent, its own documents. It persists. You can open it, read what happened, and keep working in it.</p>
-        <p>Containment and bridges are two structures over the same spaces. Containment says where a space belongs; a bridge says which spaces work together, and it carries documents and commands of its own.</p>
+        <p>Most harnesses spin up a sub-agent, collect its answer, and toss it without ever showing it to you. Whatever context it spent is simply gone. In Scint, spaces are hierarchical, so delegation works differently. When a space (usually one working in Compose) decides it needs a sub-agent, it creates a sub-space—a whole tree of them in one call, if need be—then briefs it and starts it. The sub-space follows the same transcript pattern: its own conversation, its own nested transcripts by intent, its own documents. And it persists. You can open it, read what happened, and pick up where it left off.</p>
+        <p>Containment and bridges are two structures over the same spaces. Containment says where a space belongs. A bridge says which spaces work together, and it carries documents and commands of its own.</p>
       </div>
       <figure class="shot">
         <img src="shot4.jpg" width="1657" height="1202" loading="lazy" alt="The project drawn as a graph. Spaces are cards connected left to right by containment lines, with curved bridge lines crossing between branches. Each card shows the space's name, intent and description.">
-        <figcaption>The 28-space project as a graph. Containment runs left to right; the curved lines are bridges. Each space carries its own intent, documents and record.</figcaption>
+        <figcaption>The 28-space project from earlier, drawn as a graph. Containment runs left to right, and the curved lines are bridges. Every space carries its own intent, documents and record.</figcaption>
       </figure>
     </section>
 
@@ -717,8 +717,8 @@ footer p { margin: 0; max-width: 72ch; }
       <div class="label"><span class="no">09</span>Interfaces</div>
       <h2>Intent, command and model are separate choices.</h2>
       <div class="prose">
-        <p>An intent picks a method on the space's interface, and the method supplies the command; a request can also name its own command. A model is just an argument to a command that uses one. Calling a model is one thing commands do: Observe's default command is the scheduler, not a model.</p>
-        <p>A command is an executable with a typed argument list. From that one definition, Scint derives the command line, the MCP tool schema for the space's agent, and the controls in the inspector. That holds for the provider commands and for any command added later. Claude Code's and Codex's streaming output is translated into the same set of entries (output, reasoning, tool calls, errors), so the record belongs to Scint rather than to whichever model wrote it, and providers can change between two requests.</p>
+        <p>An intent picks a method on the space's interface, and the method supplies the command. (A request can also name its own command.) A model is just an argument to a command that happens to use one. Calling a model is only one of the things commands do. Observe's default command, for instance, is the scheduler.</p>
+        <p>A command is an executable with a typed argument list. From that one definition, Scint derives the command line, the MCP tool schema for the space's agent, and the controls in the inspector. That goes for the provider commands and for any command added later. Claude Code's and Codex's streaming output both get translated into the same set of entries (output, reasoning, tool calls, errors). So the record belongs to Scint rather than whichever model wrote it, and you can switch providers between one request and the next.</p>
       </div>
       <figure>
         <div class="panel" id="iface" data-view="definition">
@@ -766,29 +766,29 @@ claude --print --output-format stream-json --verbose \
             <div><span><b>Sandbox</b><small>Default</small></span><span class="updown"><svg viewBox="0 0 10 14" aria-hidden="true"><path d="M2.5 5.5L5 3l2.5 2.5M2.5 8.5L5 11l2.5-2.5"/></svg></span></div>
           </div>
         </div>
-        <figcaption>One definition, four faces. Fixed arguments set the form of the invocation; open ones become the tool's inputs and the inspector's controls. Options become pickers, ranges become sliders, and references take <code>scint://</code> links.</figcaption>
+        <figcaption>One definition, four faces. Fixed arguments set the shape of the invocation, while open ones become the tool's inputs and the inspector's controls. Options turn into pickers, ranges turn into sliders, and references take <code>scint://</code> links.</figcaption>
       </figure>
     </section>
 
     <section id="foundations">
       <div class="label"><span class="no">10</span>Foundations</div>
-      <h2>The systems work underneath.</h2>
+      <h2>The plumbing underneath.</h2>
       <div class="facts">
-        <div><h3>MCP server</h3><p>An HTTP MCP server on localhost with built-in tools for structure, content, compose and search, plus a tool for every command attached to the calling space. An agent authenticates with its space's context id, so its command tools are its own space's.</p></div>
+        <div><h3>MCP server</h3><p>An HTTP MCP server on localhost with built-in tools for structure, content, compose and search, plus a tool for every command attached to the calling space. An agent authenticates with its space's context id, so the command tools it gets belong to its own space.</p></div>
         <div><h3>Process daemon</h3><p><code>scintd</code>, an XPC service registered through SMAppService, runs commands with the user's login-shell environment, streams output, and supervises long-running services with never, on-failure and always restart policies.</p></div>
         <div><h3>Identity and search</h3><p>A reference graph where every object carries five identifiers (object, type, descriptor, context and storage), a catalog that names and searches everything, and <code>scint://</code> links that leave the app and come back as the same object.</p></div>
-        <div><h3>Persistence and callbacks</h3><p>Plain JSON under <code>~/.local/share/scint</code> with batched, atomic writes. Every built-in tool is also an x-callback URL, parsed against the same schema MCP uses, so Shortcuts and other apps can drive the same operations.</p></div>
+        <div><h3>Persistence and callbacks</h3><p>Nothing exotic: plain JSON under <code>~/.local/share/scint</code>, with batched, atomic writes. Every built-in tool is also an x-callback URL, parsed against the same schema MCP uses, so Shortcuts and other apps can drive the same operations.</p></div>
       </div>
     </section>
 
     <section id="tradeoffs">
       <div class="label"><span class="no">11</span>Trade-offs</div>
-      <h2>What the design costs, and why it's worth it.</h2>
+      <h2>What it costs, and why I think it's worth it.</h2>
       <ul class="terms">
-        <li><span><b>Storage instead of summaries.</b> The record grows without bound. Disk is cheap and the view is bounded, so the cost lands where it hurts least, and nothing has to be guessed away.</span></li>
-        <li><span><b>Excerpts can miss older detail.</b> Anything outside a view is still one tool call away: the agent can read any transcript or document through MCP by its link.</span></li>
-        <li><span><b>A decision on every request.</b> Routing adds one network call before each run. It is a fast, typed classification rather than an agent turn, and a failure leaves the space's intent in place, so the request still runs.</span></li>
-        <li><span><b>No memory on the provider side.</b> Codex runs ephemeral and every provider run starts fresh. Continuity is Scint's job, which is exactly what makes switching providers free.</span></li>
+        <li><span><b>Storage instead of summaries.</b> The record grows without bound, which sounds worse than it is. Disk is cheap and the view is bounded, so the cost lands where it hurts least, and nothing has to be guessed away.</span></li>
+        <li><span><b>Excerpts can miss older detail.</b> True, but anything outside a view is still one tool call away. The agent can read any transcript or document through MCP by its link.</span></li>
+        <li><span><b>A decision on every request.</b> Routing adds one network call before each run. That said, it's a fast, typed classification rather than a full agent turn, and if it fails, the space keeps its intent and the request still runs.</span></li>
+        <li><span><b>No memory on the provider side.</b> Codex runs ephemeral, and every provider run starts fresh. Continuity is Scint's job, which is exactly what makes switching providers free.</span></li>
       </ul>
     </section>
 
@@ -806,7 +806,7 @@ claude --print --output-format stream-json --verbose \
           </ul>
         </div>
         <div>
-          <p>Scint is in development and designed and built by one person, Tim Kaechle. I'm available for work on LLM and agent systems: context engineering, decision-model routing, MCP integrations and full-stack products with agents at their core.</p>
+          <p>Scint is still in development, and I'm the only one building it. I'm also available for work on LLM and agent systems: context engineering, decision-model routing, MCP integrations, and full-stack products with agents at their core. If that sounds like what you're building, I'd love to hear about it.</p>
           <div class="links">
             <a class="link" href="mailto:timothy.kaechle@me.com">Get in touch</a>
             <a class="link ghost" href="runtime.html">Read the architecture notes</a>
@@ -817,7 +817,7 @@ claude --print --output-format stream-json --verbose \
   </main>
 
   <footer>
-    <p>Screens and recorded numbers come from the running app. Mapping limits are quoted from the current code and are still being tuned. Visual studies: <a href="trace.html">thread trace</a> and <a href="flow.html">flow</a>.</p>
+    <p>Screens and recorded numbers come from the running app. Mapping limits are quoted from the current code, and I'm still tuning them. Visual studies, if you're curious: <a href="trace.html">thread trace</a> and <a href="flow.html">flow</a>.</p>
     <p>Scint · a case study by Tim Kaechle</p>
   </footer>
 </div>
@@ -826,9 +826,9 @@ claude --print --output-format stream-json --verbose \
 (function () {
   var tree = document.getElementById('tree');
   var notes = {
-    read: 'The shared conversation is what a person reads: three requests and three replies. Each run sits between them as a single line.',
-    kept: 'The nested transcripts hold what the runs did: 61 tool calls and the reasoning between them, about 18,000 tokens. Nothing is summarized, and every entry stays reachable from the conversation.',
-    seen: 'The space is now in Process, so the next request sees the shared conversation and the Process transcript: about 440 tokens of 18,400. A Compose request would also see the most recent part of every intent’s transcript, up to 8,000 characters each.'
+    read: 'The shared conversation is what you read: three requests and three replies, with each run tucked between them as a single line.',
+    kept: 'The nested transcripts hold what the runs actually did: 61 tool calls and the reasoning between them, about 18,000 tokens in all. None of it is summarized, and every entry is still reachable from the conversation.',
+    seen: 'The space is in Process now, so the next request sees the shared conversation and the Process transcript: about 440 tokens out of 18,400. A Compose request would also get the most recent part of every intent’s transcript, up to 8,000 characters apiece.'
   };
   var active = { read: ['root'], kept: ['compose', 'process'], seen: ['root', 'process'] };
   var opened = {};
@@ -866,11 +866,11 @@ claude --print --output-format stream-json --verbose \
   var ap = document.getElementById('aperture');
   var keys = ['compose', 'process', 'evaluate', 'observe', 'search'];
   var intents = {
-    compose: { work: 'Arranges work across spaces instead of doing it: creates spaces, briefs them, starts and stops them, and reports what is running, finished or stalled.', struct: 'In view: this space, its child spaces and its attached bridges.', lit: ['own', 'child', 'bridge'], listed: ['documents', 'commands', 'interfaces'], root: 48000, branch: 8000, branchName: 'Every intent’s transcript', branchVal: '8,000 each', note: 'The widest view of the conversation, and the most recent part of every kind of work.' },
+    compose: { work: 'Arranges work across spaces rather than doing it: creates spaces, briefs them, starts and stops them, and reports back on what’s running, finished or stalled.', struct: 'In view: this space, its child spaces and its attached bridges.', lit: ['own', 'child', 'bridge'], listed: ['documents', 'commands', 'interfaces'], root: 48000, branch: 8000, branchName: 'Every intent’s transcript', branchVal: '8,000 each', note: 'The widest view of the conversation, plus the latest from every kind of work.' },
     process: { work: 'Open-ended work carried through to a finished result inside the space: writing, editing, analysis, planning, building, fixing.', struct: 'In view: this space and nothing outside it.', lit: ['own'], listed: ['documents', 'artifacts', 'commands'], root: 32000, branch: 48000, branchName: 'Process transcript', note: 'The deepest view of its own working history.' },
-    evaluate: { work: 'Checks work that is already done, without changing it, and returns a verdict: what holds up, what doesn’t, and why.', struct: 'In view: no structure. The space’s material is the whole picture.', lit: [], listed: ['documents', 'artifacts', 'commands'], root: 16000, branch: 32000, branchName: 'Evaluate transcript', note: 'Less of the conversation, more of its own past evaluations.' },
-    observe: { work: 'Sets work up to happen later or on a repeat. Its default command is the scheduler, not a model.', struct: 'In view: no structure, no documents and no commands.', lit: [], listed: [], root: 32000, branch: 48000, branchName: 'Process transcript', note: 'Observe records into its own transcript but reads Process’s history.' },
-    search: { work: 'Finds information and reports it, from the web, the library or the file system. It reads and changes nothing.', struct: 'In view: no structure, and none of the shared conversation.', lit: [], listed: ['documents', 'artifacts'], root: 0, branch: 24000, branchName: 'Search transcript', note: 'Each question stands on its own, with only earlier searches behind it.' }
+    evaluate: { work: 'Checks work that’s already done, without touching it, and returns a verdict: what holds up, what doesn’t, and why.', struct: 'In view: no structure. The space’s material is the whole picture.', lit: [], listed: ['documents', 'artifacts', 'commands'], root: 16000, branch: 32000, branchName: 'Evaluate transcript', note: 'Less of the conversation, more of its own past evaluations.' },
+    observe: { work: 'Sets work up to happen later or on a repeat. Its default command is the scheduler, so no model is involved.', struct: 'In view: no structure, no documents and no commands.', lit: [], listed: [], root: 32000, branch: 48000, branchName: 'Process transcript', note: 'Observe records into its own transcript but reads Process’s history.' },
+    search: { work: 'Finds information and reports it, whether from the web, the library or the file system. It looks, but it doesn’t touch.', struct: 'In view: no structure, and none of the shared conversation.', lit: [], listed: ['documents', 'artifacts'], root: 0, branch: 24000, branchName: 'Search transcript', note: 'Each question stands on its own, with only earlier searches behind it.' }
   };
   function fmt(n) { return n === 0 ? 'none' : n.toLocaleString('en-US'); }
   function renderIntent() {

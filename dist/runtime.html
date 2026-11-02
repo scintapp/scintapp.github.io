@@ -165,15 +165,15 @@ footer p { margin: 0; max-width: 72ch; }
     <section class="hero">
       <div class="label"><span class="glyph"></span>Architecture notes</div>
       <h1>A workspace built as <em>one</em> graph.</h1>
-      <p class="lede">These notes accompany the <a href="index.html">Scint case study</a>. Under the app is a runtime that gives every space, document, command and transcript an identity, and expresses every relation between them the same way. The app is a set of views over those objects and keeps no second copy of any of them. Four ideas carry most of it.</p>
+      <p class="lede">These notes go with the <a href="index.html">Scint case study</a>. Underneath the app is a runtime that gives every space, document, command and transcript an identity, and expresses every relation between them the same way. The app itself is just a set of views over those objects, and it never keeps a second copy of any of them. Four ideas do most of the heavy lifting.</p>
     </section>
 
     <section id="identity">
       <div class="label"><span class="glyph"></span>Identity</div>
       <h2>Nothing is copied.</h2>
       <div class="prose">
-        <p>Every object in Scint has one reference, and everything that uses the object holds that reference. A space points to its documents with one. A document points to a document inside it with one. A transcript points to the nested transcript behind a reply with one.</p>
-        <p>Nobody holds a copy, so nobody holds a stale one. When an agent edits a document someone has open there is nothing to sync, because there is only one document. This is also why a request can list documents instead of including them: the agent reads the one document, as it is, when it needs it.</p>
+        <p>Every object in Scint has one reference, and anything that uses the object holds that reference. A space uses one to point to its documents. A document uses one to point to a document inside it, and a transcript uses one to point to the nested transcript behind a reply.</p>
+        <p>Nobody holds a copy, so nobody holds a stale one. When an agent edits a document you have open, there's nothing to sync, because there's only ever one document. It's also why a request can list documents instead of including them: the agent reads that one document, as it is, whenever it needs to.</p>
       </div>
       <figure>
         <div class="panel">
@@ -209,10 +209,10 @@ footer p { margin: 0; max-width: 72ch; }
             </div>
           </div>
         </div>
-        <figcaption>One document in four places. Change its first line and every reader shows the change, because each one looks the document up when it needs it. The address is the same everywhere and never changes.</figcaption>
+        <figcaption>One document in four places. Go ahead and change its first line. Every reader shows the change, because each one looks the document up when it needs it. The address is the same everywhere, and it never changes.</figcaption>
       </figure>
       <div class="prose">
-        <p>A reference carries five identifiers (object, type, descriptor, context and storage), so a bare reference already knows its type, its store, its name and its file. It leaves Scint as a link and comes back as the same object, whether it travelled through a document, a command's arguments or another application. Remove an object and its descriptor stays behind, so a link held elsewhere still says what it pointed to.</p>
+        <p>A reference carries five identifiers (object, type, descriptor, context and storage), so even a bare reference knows its type, its store, its name and its file. It can leave Scint as a link and come back as the same object, whether it traveled through a document, a command's arguments or another application entirely. Delete an object and its descriptor stays behind, so a link held somewhere else still says what it used to point to.</p>
       </div>
     </section>
 
@@ -220,8 +220,8 @@ footer p { margin: 0; max-width: 72ch; }
       <div class="label"><span class="glyph"></span>Structure</div>
       <h2>Where things belong, and how they relate.</h2>
       <div class="prose">
-        <p>A project needs a hierarchy and a web of connections, and forcing one into the other bends both. Scint keeps them as two structures over the same spaces. Containment says where a space belongs. Bridges say which spaces work together, and they cross the hierarchy freely.</p>
-        <p>A bridge is more than a line. It has a closure of its own, with documents and commands, so the relationship between two spaces carries what their collaboration runs on. Compose is the intent that sees this structure: its view lists the space, its child spaces and its attached bridges.</p>
+        <p>A project needs both a hierarchy and a web of connections, and forcing one into the other bends both out of shape. So Scint keeps them as two structures over the same spaces. Containment says where a space belongs. Bridges say which spaces work together, and they cross the hierarchy freely.</p>
+        <p>A bridge is more than a line, though. It has a closure of its own, with documents and commands, so the relationship between two spaces carries whatever their collaboration runs on. Compose is the intent that sees this structure, and its view lists the space, its child spaces and its attached bridges.</p>
       </div>
       <figure>
         <div class="panel" id="structure-figure" data-view="both">
@@ -260,8 +260,8 @@ footer p { margin: 0; max-width: 72ch; }
       <div class="label"><span class="glyph"></span>Documents</div>
       <h2>Content that runs.</h2>
       <div class="prose">
-        <p>Documents are built from blocks: headings, paragraphs, code, tasks, and references to files, commands and other documents. A block that refers to another document makes documents recursive. A brief can hold the research it depends on, and a second brief can hold the same research.</p>
-        <p>A request in Scint is a document too. Its header holds execution settings, keyed by the interface or command they configure, so instructions travel with everything needed to carry them out. One model serves as a page you read, a message you send and a task that dispatches on a schedule.</p>
+        <p>Documents are made of blocks: headings, paragraphs, code, tasks, and references to files, commands and other documents. That last kind is what makes documents recursive. A brief can hold the research it depends on, and a second brief can hold the very same research.</p>
+        <p>A request in Scint is a document, too. Its header holds execution settings, keyed by the interface or command they configure, so instructions travel with everything needed to carry them out. In other words, one model does triple duty: a page you read, a message you send and a task that dispatches on a schedule.</p>
       </div>
       <figure>
         <div class="panel" id="doc" data-mode="written">
@@ -284,7 +284,7 @@ footer p { margin: 0; max-width: 72ch; }
             <span class="type">by address</span><div class="body">release/ travels as a path the agent can open, and Proofread before launch as a task line.</div>
           </div>
         </div>
-        <figcaption>One document, written once. Submitted to a space, its header says how it runs, and the document it embeds is read as it stands at that moment. The line shown is the one you edited above.</figcaption>
+        <figcaption>One document, written once. Submit it to a space, and its header says how it runs, while the document it embeds is read as it stands at that moment. The line shown is the one you edited above.</figcaption>
       </figure>
     </section>
 
@@ -292,7 +292,7 @@ footer p { margin: 0; max-width: 72ch; }
       <div class="label"><span class="glyph"></span>Execution</div>
       <h2>One path into a space.</h2>
       <div class="prose">
-        <p>Every interaction that starts work does the same thing: it adds a document to a space's input and composes the space. A typed message, a task that comes due, an MCP compose call, one space briefing another and a <code>scint://</code> callback URL all take this path, so every run is queued, recorded and ended by the same rules.</p>
+        <p>Every interaction that starts work does the same thing: it adds a document to a space's input and composes the space. A typed message, a task that comes due, an MCP compose call, one space briefing another, a <code>scint://</code> callback URL—they all take this path. So every run gets queued, recorded and ended by the same rules.</p>
       </div>
       <figure>
         <div class="panel flow">
@@ -315,7 +315,7 @@ footer p { margin: 0; max-width: 72ch; }
             </svg>
           </div>
           <div class="stages">
-            <b>Queue</b><span>The space's Broker holds pending, active and draft input documents. When a draft is submitted it is buffered, published to the Composer, and replaced by a fresh draft that inherits its settings.</span>
+            <b>Queue</b><span>The space's Broker holds pending, active and draft input documents. When a draft is submitted, it's buffered, published to the Composer, and replaced by a fresh draft that inherits its settings.</span>
             <b>Classify</b><span>The Composer creates a Handler for the input. The Classifier sends Jev the request, the last six messages and the routing guide, or uses an intent the request names itself.</span>
             <b>Map</b><span>The Handler finds or creates the intent's nested transcript, renders the request through the intent's mapping, and resolves the command from the method on the space's interface, or from the request's own choice.</span>
             <b>Run</b><span><code>scintd</code> runs the command line with the user's login-shell environment and <code>SCINT_CONTEXT</code> set to the space's context id, which the agent presents to the MCP server.</span>
@@ -325,13 +325,13 @@ footer p { margin: 0; max-width: 72ch; }
         <figcaption>The execution path. A space's status is derived from the signals in its transcript and its live handlers, never stored beside them.</figcaption>
       </figure>
       <div class="prose">
-        <p>The same path also starts long-running services. A published policy document, given to a space, has <code>scintd</code> register and start a long-running service, alongside the agent runs.</p>
+        <p>The same path starts long-running services, too. Give a space a published policy document, and <code>scintd</code> registers and starts a long-running service right alongside the agent runs.</p>
       </div>
     </section>
 
     <section class="by">
       <div class="label"><span class="glyph"></span>Built by</div>
-      <p>The runtime, the MCP server, the process daemon, the app and its design system are designed and built by one person, Tim Kaechle.</p>
+      <p>The runtime, the MCP server, the process daemon, the app and its design system were all designed and built by one person, Tim Kaechle.</p>
       <div class="links">
         <a class="link" href="index.html">Back to the case study</a>
         <a class="link ghost" href="index.html#contact">Get in touch</a>
